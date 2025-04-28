@@ -140,19 +140,32 @@
                     <th style="border: 1px solid #ddd; padding: 8px;">Aksiyon</th>
                   </tr>';
 
-            while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                echo '<tr>';
-                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adi']) . '</td>';
-                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_telefonu']) . '</td>';
-                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adresi']) . '</td>';
-                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['adres_tarifi']) . '</td>';
-                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
-                echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
-                        <button style="background-color: #28a745; color: white; border: none; padding: 10px 15px; margin-right: 5px; border-radius: 5px; cursor: pointer;">Kabul Et</button>
-                        <button style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">İptal Et</button>
-                      </td>';
-                echo '</tr>';
-            }
+           while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    echo '<tr>';
+    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adi']) . '</td>';
+    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_telefonu']) . '</td>';
+    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adresi']) . '</td>';
+    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['adres_tarifi']) . '</td>';
+    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
+
+    // Form tabanlı butonları buraya ekliyorsunuz
+    echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+            <!-- Kabul Et Butonu -->
+            <form action="islem.php" method="POST" style="display:inline;">
+                <input type="hidden" name="islem" value="kabul">
+                <input type="hidden" name="id" value="' . htmlspecialchars($kurye['id']) . '">
+                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; margin-right: 5px; border-radius: 5px; cursor: pointer;">Kabul Et</button>
+            </form>
+
+            <!-- İptal Et Butonu -->
+            <form action="islem.php" method="POST" style="display:inline;">
+                <input type="hidden" name="islem" value="iptal">
+                <input type="hidden" name="id" value="' . htmlspecialchars($kurye['id']) . '">
+                <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">İptal Et</button>
+            </form>
+          </td>';
+    echo '</tr>';
+}
 
             echo '</table>';
 
