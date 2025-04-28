@@ -89,10 +89,11 @@
 
                 <ul class="navbar-nav">
                     <li class="menu-title">MENÜ</li>
-                    <li class="nav-item"><a class="nav-link" href="restopanel.php">Panel</a></li>
-                    <li class="nav-item"><a class="nav-link" href="siparisler.php">Siparişler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="kuryeler.php">Kuryeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="rapor.php">Raporlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="panel.html">Panel</a></li>
+                    <li class="nav-item"><a class="nav-link" href="siparisler.html">Siparişler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="isletmeler.html">İşletmeler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="kuryeler.html">Kuryeler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="rapor.html">Raporlar</a></li>
                 </ul>
             </div>
         </div>
@@ -281,6 +282,60 @@
             modal.hide();
         });
     </script>
+    <!-- Vendor Javascript -->
+<script src="assets/js/vendor.min.js"></script>
+<script src="assets/js/app.js"></script>
+
+<!-- Form Submit Handler -->
+<script>
+    document.getElementById('kuryeCagirForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Form verilerini al
+        const musteriAdi = document.getElementById('musteriAdi').value;
+        const musteriTelefonu = document.getElementById('musteriTelefonu').value;
+        const musteriAdresi = document.getElementById('musteriAdresi').value;
+        const adresTarifi = document.getElementById('adresTarifi').value;
+        const odemeYontemi = document.getElementById('odemeYontemi').value;
+
+        // Veriyi sunucuya gönder
+        fetch('../update_panel.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                musteriAdi,
+                musteriTelefonu,
+                musteriAdresi,
+                adresTarifi,
+                odemeYontemi
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Sesli bildirim
+                const msg = new SpeechSynthesisUtterance(`Kurye çağrısı başarıyla oluşturuldu!`);
+                window.speechSynthesis.speak(msg);
+                
+
+                alert('Kurye çağrısı başarıyla oluşturuldu!');
+            } else {
+                alert('Bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+        });
+
+        // Modalı kapat
+        const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeCagirModal'));
+        modal.hide();
+    });
+</script>
+</body>
+</html>
 </body>
 
 </html>
