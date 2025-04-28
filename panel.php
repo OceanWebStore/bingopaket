@@ -113,13 +113,58 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Kurye Talep Ekranı</h4>
+    <h4>Kurye Talep Ekranı</h4>
+    <!-- Dinamik veri buraya yazılacak -->
+    <div id="kurye-bilgileri">
+        <?php
+        // Veritabanı bağlantısı
+        $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
+        $username = "oceanweb_kuryeuser"; // Veritabanı kullanıcı adı
+        $password = "ko61tu61."; // Veritabanı şifresi
+
+        try {
+            $pdo = new PDO($dsn, $username, $password);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Tüm kayıtları al
+            $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
+            $stmt = $pdo->query($query);
+
+            echo '<table style="width: 100%; border-collapse: collapse;">';
+            echo '<tr>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Müşteri Adı</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Telefon</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Adres</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Adres Tarifi</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Ödeme Yöntemi</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Aksiyon</th>
+                  </tr>';
+
+            while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                echo '<tr>';
+                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adi']) . '</td>';
+                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_telefonu']) . '</td>';
+                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adresi']) . '</td>';
+                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['adres_tarifi']) . '</td>';
+                echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
+                echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                        <button style="background-color: #28a745; color: white; border: none; padding: 10px 15px; margin-right: 5px; border-radius: 5px; cursor: pointer;">Kabul Et</button>
+                        <button style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">İptal Et</button>
+                      </td>';
+                echo '</tr>';
+            }
+
+            echo '</table>';
+
+        } catch (PDOException $e) {
+            echo "Veritabanı hatası: " . $e->getMessage();
+        }
+        ?>
+    </div>
+</div>
                             </div>
                             <div class="card-body">
-                                <!-- Kurye Çağır Butonu -->
-                                <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#kuryeCagirModal">
-                                    Kurye Çağır
-                                </button>
+                                <!-- "Kurye Çağır" butonu ve ilgili pop-up kaldırıldı -->
                             </div>
                         </div>
                     </div>
@@ -132,79 +177,25 @@
     </div>
     <!-- Wrapper Bitiş -->
 
-    <!-- Modal (Pop-up) -->
-    <div class="modal fade" id="kuryeCagirModal" tabindex="-1" aria-labelledby="kuryeCagirModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="kuryeCagirModalLabel">Kurye Çağır</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="kuryeCagirForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="musteriAdi" class="form-label">Müşteri Adı</label>
-                            <input type="text" class="form-control" id="musteriAdi" placeholder="Müşteri Adı" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="musteriTelefonu" class="form-label">Müşteri Telefonu</label>
-                            <input type="tel" class="form-control" id="musteriTelefonu" placeholder="Telefon Numarası" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="musteriAdresi" class="form-label">Müşteri Adresi</label>
-                            <textarea class="form-control" id="musteriAdresi" rows="2" placeholder="Müşteri Adresi" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="adresTarifi" class="form-label">Adres Tarifi</label>
-                            <textarea class="form-control" id="adresTarifi" rows="2" placeholder="Adres Tarifi"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="odemeYontemi" class="form-label">Ödeme Yöntemi</label>
-                            <select class="form-select" id="odemeYontemi" required>
-                                <option value="">Ödeme Yöntemi Seçin</option>
-                                <option value="Online Ödeme">Online Ödeme</option>
-                                <option value="Nakit">Nakit</option>
-                                <option value="Kapıda Kredi Kartı">Kapıda Kredi Kartı</option>
-                                <option value="Kapıda Yemek Kartı">Kapıda Yemek Kartı</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                        <button type="submit" class="btn btn-primary">Kurye Çağır</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Vendor Javascript -->
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
+<!-- Mevcut dosyanın sonlarına eklenmelidir -->
+<script>
+    setInterval(() => {
+        fetch('panel.php')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector('#kurye-bilgileri').innerHTML;
 
-    <!-- Form Submit Handler -->
-    <script>
-        document.getElementById('kuryeCagirForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const musteriAdi = document.getElementById('musteriAdi').value;
-            const musteriTelefonu = document.getElementById('musteriTelefonu').value;
-            const musteriAdresi = document.getElementById('musteriAdresi').value;
-            const adresTarifi = document.getElementById('adresTarifi').value;
-            const odemeYontemi = document.getElementById('odemeYontemi').value;
-
-            console.log('Kurye Çağrısı Yapıldı:', {
-                musteriAdi,
-                musteriTelefonu,
-                musteriAdresi,
-                adresTarifi,
-                odemeYontemi
-            });
-
-            alert('Kurye çağrısı başarıyla oluşturuldu!');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeCagirModal'));
-            modal.hide();
-        });
-    </script>
+                document.getElementById('kurye-bilgileri').innerHTML = newContent;
+            })
+            .catch(error => console.error('Hata:', error));
+    }, 5000); // 5 saniyede bir güncelle
+</script>
+</body>
 </body>
 
 </html>
