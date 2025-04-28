@@ -7,7 +7,7 @@
 
 		// Giriş kontrolü
 		if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-		header('Location: giris-yap.php');
+		header('Location: panel.php');
 		exit;
 		}
 		?>
