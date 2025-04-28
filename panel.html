@@ -1,0 +1,711 @@
+<!DOCTYPE p>
+<html lang="tr">
+
+		<head>
+		<?php
+		session_start();
+
+		// Giriş kontrolü
+		if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+		header('Location: giris-yap.php');
+		exit;
+		}
+		?>
+    <!-- Title Meta -->
+    <meta charset="utf-8" />
+    <title>Bingo Paket - Sıcak Sıcak Kapında !</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Taplox: An advanced, fully responsive admin dashboard template packed with features to streamline your analytics and management needs." />
+    <meta name="author" content="StackBros" />
+    <meta name="keywords" content="Taplox, admin dashboard, responsive template, analytics, modern UI, management tools" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+
+    <!-- Google Font Family link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap" rel="stylesheet">
+
+    <!-- Vendor css -->
+    <link href="assets/css/vendor.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Icons css -->
+    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- App css -->
+    <link href="assets/css/style.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Theme Config js -->
+    <script src="assets/js/config.js"></script>
+</head>
+
+<body>
+
+    <!-- START Wrapper -->
+    <div class="app-wrapper">
+
+        <!-- Topbar Start -->
+        <header class="app-topbar">
+             <div class="container-fluid">
+                  <div class="navbar-header">
+                       <div class="d-flex align-items-center gap-2">
+                            <!-- Menu Toggle Button -->
+                            <div class="topbar-item">
+                                 <button type="button" class="button-toggle-menu topbar-button">
+                                      <iconify-icon icon="solar:hamburger-menu-outline"
+                                           class="fs-24 align-middle"></iconify-icon>
+                                 </button>
+                            </div>
+
+                            <!-- App Search-->
+                            <form class="app-search d-none d-md-block me-auto">
+                                 <div class="position-relative">
+                                      <input type="search" class="form-control" placeholder="Arama Yap"
+                                           autocomplete="off" value="">
+                                      <iconify-icon icon="solar:magnifer-outline" class="search-widget-icon"></iconify-icon>
+                                 </div>
+                            </form>
+                       </div>
+
+                       <div class="d-flex align-items-center gap-2">
+                            <!-- Theme Color (Light/Dark) -->
+                            <div class="topbar-item">
+                                 <button type="button" class="topbar-button" id="light-dark-mode">
+                                      <iconify-icon icon="solar:moon-outline"
+                                           class="fs-22 align-middle light-mode"></iconify-icon>
+                                      <iconify-icon icon="solar:sun-2-outline"
+                                           class="fs-22 align-middle dark-mode"></iconify-icon>
+                                 </button>
+                            </div>
+
+                            <!-- Notification -->
+                            <div class="dropdown topbar-item">
+                                 <button type="button" class="topbar-button position-relative"
+                                      id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                                      aria-expanded="false">
+                                      <iconify-icon icon="solar:bell-bing-outline" class="fs-22 align-middle"></iconify-icon>
+                                      <span
+                                           class="position-absolute topbar-badge fs-10 translate-middle badge bg-danger rounded-pill">5<span
+                                                class="visually-hidden">unread messages</span></span>
+                                 </button>
+                                 <div class="dropdown-menu py-0 dropdown-lg dropdown-menu-end"
+                                      aria-labelledby="page-header-notifications-dropdown">
+                                      <div class="p-2 border-bottom bg-light bg-opacity-50">
+                                           <div class="row align-items-center">
+                                                <div class="col">
+                                                     <h6 class="m-0 fs-16 fw-semibold"> Notifications (5)</h6>
+                                                </div>
+                                                <div class="col-auto">
+                                                     <a href="javascript: void(0);" class="text-dark text-decoration-underline">
+                                                          <small>Clear All</small>
+                                                     </a>
+                                                </div>
+                                           </div>
+                                      </div>
+                                      <div data-simplebar style="max-height: 250px;">
+                                           <!-- Item -->
+                                           <a href="javascript:void(0);" class="dropdown-item p-2 border-bottom text-wrap">
+                                                <div class="d-flex">
+                                                     <div class="flex-shrink-0">
+                                                          <img src="assets/images/users/avatar-1.jpg"
+                                                               class="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-1" />
+                                                     </div>
+                                                     <div class="flex-grow-1">
+                                                          <p class="mb-0"><span class="fw-medium">Sally Bieber </span>started
+                                                               following you. Check out their profile!"</span></p>
+                                                     </div>
+                                                </div>
+                                           </a>
+                                           <!-- Item -->
+                                           <a href="javascript:void(0);" class="dropdown-item p-2 border-bottom">
+                                                <div class="d-flex">
+                                                     <div class="flex-shrink-0">
+                                                          <div class="avatar-sm me-2">
+                                                               <span
+                                                                    class="avatar-title text-bg-info fw-semibold fs-20 rounded-circle">
+                                                                    G
+                                                               </span>
+                                                          </div>
+                                                     </div>
+                                                     <div class="flex-grow-1">
+                                                          <p class="mb-0 fw-medium">Gloria Chambers</p>
+                                                          <p class="mb-0 text-wrap">
+                                                               mentioned you in a comment: '@admin, check this out!
+                                                          </p>
+                                                     </div>
+                                                </div>
+                                           </a>
+                                           <!-- Item -->
+                                           <a href="javascript:void(0);" class="dropdown-item p-2 border-bottom">
+                                                <div class="d-flex">
+                                                     <div class="flex-shrink-0">
+                                                          <img src="assets/images/users/avatar-3.jpg"
+                                                               class="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-3" />
+                                                     </div>
+                                                     <div class="flex-grow-1">
+                                                          <p class="mb-0 fw-medium">Jacob Gines</p>
+                                                          <p class="mb-0 text-wrap">
+                                                               Answered to your comment on the cash flow forecast's graph 🔔.
+                                                          </p>
+                                                     </div>
+                                                </div>
+                                           </a>
+                                           <!-- Item -->
+                                           <a href="javascript:void(0);" class="dropdown-item p-2 border-bottom">
+                                                <div class="d-flex">
+                                                     <div class="flex-shrink-0">
+                                                          <div class="avatar-sm me-2">
+                                                               <span
+                                                                    class="avatar-title bg-soft-warning text-warning fs-20 rounded-circle">
+                                                                    <iconify-icon icon="solar:leaf-outline"></iconify-icon>
+                                                               </span>
+                                                          </div>
+                                                     </div>
+                                                     <div class="flex-grow-1">
+                                                          <p class="mb-0 fw-medium text-wrap">A new system update is available.
+                                                               Update now for the latest features.</p>
+                                                     </div>
+                                                </div>
+                                           </a>
+                                           <!-- Item -->
+                                           <a href="javascript:void(0);" class="dropdown-item p-2 border-bottom">
+                                                <div class="d-flex">
+                                                     <div class="flex-shrink-0">
+                                                          <img src="assets/images/users/avatar-5.jpg"
+                                                               class="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-5" />
+                                                     </div>
+                                                     <div class="flex-grow-1">
+                                                          <p class="mb-0 fw-medium">Shawn Bunch</p>
+                                                          <p class="mb-0 text-wrap">
+                                                               commented on your post: 'Great photo!
+                                                          </p>
+                                                     </div>
+                                                </div>
+                                           </a>
+                                      </div>
+                                      <div class="text-center p-2">
+                                           <a href="javascript:void(0);" class="btn btn-primary btn-sm">View All Notification <i
+                                                     class="bx bx-right-arrow-alt ms-1"></i></a>
+                                      </div>
+                                 </div>
+                            </div>
+
+                            <!-- User -->
+                            <div class="dropdown topbar-item">
+                                 <a type="button" class="topbar-button" id="page-header-user-dropdown" data-bs-toggle="dropdown"
+                                      aria-haspopup="true" aria-expanded="false">
+                                      <span class="d-flex align-items-center">
+                                           <img class="rounded-circle" width="32" src="assets/images/users/avatar-1.jpg"
+                                                alt="avatar-3">
+                                      </span>
+                                 </a>
+                                 <div class="dropdown-menu dropdown-menu-end">
+                                      <!-- item-->
+                                      <h6 class="dropdown-header">Welcome!</h6>
+
+                                      <a class="dropdown-item" href="#">
+                                           <iconify-icon icon="solar:user-outline"
+                                                class="align-middle me-2 fs-18"></iconify-icon><span class="align-middle">My
+                                                Account</span>
+                                      </a>
+
+                                      <a class="dropdown-item" href="#">
+                                           <iconify-icon icon="solar:wallet-outline"
+                                                class="align-middle me-2 fs-18"></iconify-icon><span
+                                                class="align-middle">Pricing</span>
+                                      </a>
+                                      <a class="dropdown-item" href="#">
+                                           <iconify-icon icon="solar:help-outline"
+                                                class="align-middle me-2 fs-18"></iconify-icon><span
+                                                class="align-middle">Help</span>
+                                      </a>
+                                      <a class="dropdown-item" href="auth-lock-screen.html">
+                                           <iconify-icon icon="solar:lock-keyhole-outline"
+                                                class="align-middle me-2 fs-18"></iconify-icon><span class="align-middle">Lock
+                                                screen</span>
+                                      </a>
+
+                                      <div class="dropdown-divider my-1"></div>
+
+                                      <a class="dropdown-item text-danger" href="giris-yap.html">
+                                           <iconify-icon icon="solar:logout-3-outline"
+                                                class="align-middle me-2 fs-18"></iconify-icon><span
+                                                class="align-middle">Logout</span>
+                                      </a>
+                                 </div>
+                            </div>
+                       </div>
+                  </div>
+             </div>
+        </header>
+        <!-- Topbar End -->
+
+        <!-- App Menu Start -->
+        <div class="app-sidebar">
+             <!-- Sidebar Logo -->			 
+			 <br>
+             <div class="logo-box">
+                  <a href="panel.html" class="logo-dark">
+                       <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
+                       <img src="assets/images/logo-dark.png" class="logo-lg" alt="logo dark">
+                  </a>
+
+                  <a href="panel.html" class="logo-light">
+                       <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
+                       <img src="assets/images/logo-light.png" class="logo-lg" alt="logo light">
+                  </a>
+             </div>
+
+             <div class="scrollbar" data-simplebar>
+
+             <ul class="navbar-nav" id="navbar-nav">
+			 
+			<br>
+					
+             <li class="menu-title">MENU</li>
+
+             <li class="nav-item">
+                            <a class="nav-link" href="panel.html">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:widget-2-outline"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text"> Panel </span>
+                                
+                            </a>
+                       </li>
+
+      <div class="collapse" id="sidebarMultiLevelDemo">
+                                 <ul class="nav sub-navbar-nav">
+                                     
+                                           </a>
+                                           
+                                     
+                                 </ul>
+                            </div>
+                       </li>
+					   
+					    <li class="nav-item">
+                            <a class="nav-link" href="siparisler.html">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:window-frame-outline"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text"> Siparişler </span>
+                                
+                            </a>
+                       </li>
+					   
+					   <li class="nav-item">
+                            <a class="nav-link" href="isletmeler.html">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:share-circle-outline"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text"> İşletmeler </span>
+                                
+                            </a>
+                       </li>
+					   
+					    <li class="nav-item">
+                            <a class="nav-link" href="kuryeler.html">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:window-frame-outline"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text"> Kuryeler </span>
+                                
+                            </a>
+                       </li>
+					   
+					     <li class="nav-item">
+                            <a class="nav-link" href="rapor.html">
+                                 <span class="nav-icon">
+                                      <iconify-icon icon="solar:danger-outline"></iconify-icon>
+                                 </span>
+                                 <span class="nav-text"> Raporlar </span>
+                                
+                            </a>
+                       </li>
+					   
+					   
+					   
+					   
+					   
+					   
+                       
+                  </ul>
+             </div>
+        </div>
+        <!-- App Menu End -->
+
+        <!-- ==================================================== -->
+        <!-- Start right Content here -->
+        <!-- ==================================================== -->
+        <div class="page-content">
+
+            <!-- Start Container Fluid -->
+            <div class="container-fluid">
+
+                <!-- ========== Page Title Start ========== -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box">
+                            <h4 class="mb-0">Panel</h4>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="javascript: void(0);">BinGo</a></li>
+                                <li class="breadcrumb-item active">Panel</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- ========== Page Title End ========== -->
+
+                <div class="row">
+                    <!-- Card 1 -->
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-md bg-primary bg-opacity-10 rounded-circle">
+                                            <iconify-icon icon="solar:globus-outline"
+                                                class="fs-32 text-primary avatar-title"></iconify-icon>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="text-muted mb-0 text-truncate">Toplam Sipariş Sayısı</p>
+                                        <h3 class="text-dark mt-2 mb-0">15,352</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer border-0 py-2 bg-light bg-opacity-50 mx-2 mb-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted ms-1 fs-12">Aylık</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-md bg-primary bg-opacity-10 rounded-circle">
+                                            <iconify-icon icon="solar:bag-check-outline"
+                                                class="fs-32 text-primary avatar-title"></iconify-icon>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="text-muted mb-0 text-truncate">Sipariş Sayısı</p>
+                                        <h3 class="text-dark mt-2 mb-0">8,764</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer border-0 py-2 bg-light bg-opacity-50 mx-2 mb-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        
+                                        <span class="text-muted ms-1 fs-12">Günlük</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-md bg-primary bg-opacity-10 rounded-circle">
+                                            <iconify-icon icon="solar:calendar-date-outline"
+                                                class="fs-32 text-primary avatar-title"></iconify-icon>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="text-muted mb-0 text-truncate">Toplam Kurye</p>
+                                        <h3 class="text-dark mt-2 mb-0">5,123</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer border-0 py-2 bg-light bg-opacity-50 mx-2 mb-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted ms-1 fs-12">Genel  Toplam</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-md bg-primary bg-opacity-10 rounded-circle">
+                                            <iconify-icon icon="solar:users-group-two-rounded-outline"
+                                                class="fs-32 text-primary avatar-title"></iconify-icon>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="text-muted mb-0 text-truncate">Toplam İşletme</p>
+                                        <h3 class="text-dark mt-2 mb-0">12,945</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer border-0 py-2 bg-light bg-opacity-50 mx-2 mb-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted ms-1 fs-12">Genel Toplam</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card card-height-100">
+                            <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                                <h4 class="card-title flex-grow-1">Kurye Talep Ekranı</h4>
+                            </div>
+
+                         <!--  Kurye Çağrıları Bu Alana Gelecek -->
+						 Kurye Çağrıları Bu Alana Gelecek
+						 <br><br><br><br><br><br><br><br>
+						 
+						  <!--  Kurye Çağrıları Bu Alana Gelecek -->
+
+                        </div> <!-- end card-->
+                    </div> <!-- end col -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div
+                                class="d-flex card-header justify-content-between align-items-center border-bottom border-dashed">	
+                                  <h4 class="card-title flex-grow-1">Son Eklenen İşletmeler</h4>
+                            </div>
+
+                         <!--  Son Eklenen İşletmeler Bu Alana Gelecek -->
+						 
+						 Son Eklenen İşletmeler Bu Alana Gelecek
+						 <br><br><br><br><br><br><br><br>
+						 
+						  <!--  Son Eklenen İşletmeler Bu Alana Gelecek -->
+
+                        </div> <!-- end card-->
+                              
+                           
+
+
+                        </div> <!-- end card-->
+                    </div> <!-- end col-->
+
+                </div> <!-- End row -->
+
+                <div class="row">
+                    <div class="col-xl-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h4 class="card-title">Son Eklenen Kuryeler</h4>
+
+                                    <a href="#!" class="btn btn-sm btn-primary">
+                                        <i class="bx bx-plus me-1"></i>Yeni Kurye Ekle
+                                    </a>
+                                </div>
+                            </div> <!-- end card body -->
+
+                            <div class="table-responsive table-centered">
+                                <table class="table mb-0">
+                                    <thead class="bg-light bg-opacity-50">
+                                        <th class="border-0 py-2">Tarih</th>
+                                        <th class="border-0 py-2">İsim</th>
+                                        <th class="border-0 py-2">Hesap</th>
+                                        <th class="border-0 py-2">Kullanıcı Adı</th>
+                                    </thead>
+                                    <tbody>
+                                         <tr>
+                                            <td>26 Nisan 2025</td>
+                                            <td><img src="assets/images/users/avatar-6.jpg" alt="avatar-2"
+                                                    class="img-fluid avatar-xs rounded-circle"> <span
+                                                    class="align-middle ms-1">Ahmet YILMAZ</span></td>
+                                            <td><span class="badge badge-soft-success">Doğrulandı</span></td>
+                                            <td>@ayilmaz </td>
+                                        </tr>
+                                    
+									<td>26 Nisan 2025</td>
+                                            <td><img src="assets/images/users/avatar-6.jpg" alt="avatar-2"
+                                                    class="img-fluid avatar-xs rounded-circle"> <span
+                                                    class="align-middle ms-1">Ahmet YILMAZ</span></td>
+                                            <td><span class="badge badge-soft-success">Doğrulandı</span></td>
+                                            <td>@ayilmaz </td>
+                                        </tr>
+										
+										<td>26 Nisan 2025</td>
+                                            <td><img src="assets/images/users/avatar-6.jpg" alt="avatar-2"
+                                                    class="img-fluid avatar-xs rounded-circle"> <span
+                                                    class="align-middle ms-1">Ahmet YILMAZ</span></td>
+                                            <td><span class="badge badge-soft-success">Doğrulandı</span></td>
+                                            <td>@ayilmaz </td>
+                                        </tr>
+										
+										<td>26 Nisan 2025</td>
+                                            <td><img src="assets/images/users/avatar-6.jpg" alt="avatar-2"
+                                                    class="img-fluid avatar-xs rounded-circle"> <span
+                                                    class="align-middle ms-1">Ahmet YILMAZ</span></td>
+                                            <td><span class="badge badge-soft-success">Doğrulandı</span></td>
+                                            <td>@ayilmaz </td>
+                                        </tr>
+										
+										<td>26 Nisan 2025</td>
+                                            <td><img src="assets/images/users/avatar-6.jpg" alt="avatar-2"
+                                                    class="img-fluid avatar-xs rounded-circle"> <span
+                                                    class="align-middle ms-1">Ahmet YILMAZ</span></td>
+                                            <td><span class="badge badge-soft-success">Doğrulandı</span></td>
+                                            <td>@ayilmaz </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> <!-- table responsive -->
+
+                            
+                        </div> <!-- end card-->
+                    </div> <!-- end col -->
+
+                    <div class="col-xl-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h4 class="card-title">Son Siparişler</h4>
+
+                                    <a href="#!" class="btn btn-sm btn-primary">
+                                        <i class="bx bx-plus me-1"></i>Yeni Sipariş Oluştur
+                                    </a>
+                                </div>
+                            </div> <!-- end card body -->
+                            <div class="table-responsive table-centered">
+                                <table class="table mb-0">
+                                    <thead class="bg-light bg-opacity-50">
+                                        <tr>
+                                            <th class="border-0 py-2">Restaurant</th>
+                                            <th class="border-0 py-2">Tarih</th>
+                                            <th class="border-0 py-2">Müşteri Adı</th>
+                                            <th class="border-0 py-2">Telefon Numarası</th>
+                                            <th class="border-0 py-2">Adres</th>
+                                            <th class="border-0 py-2">Ödeme Yöntemi</th>
+                                            <th class="border-0 py-2">Durum</th>
+                                        </tr>
+                                    </thead> <!-- end thead-->
+                                    <tbody>
+                                        <tr>
+                                            <td><a href="#!">#TZ5625</a></td>
+                                            <td>29 April 2024</td>
+                                            <td><a href="#!">Anna M. Hines</a></td>
+                                            <td>(+1)-555-1564-261</td>
+                                            <td>Burr Ridge/Illinois</td>
+                                            <td>Credit Card</td>
+                                            <td><i class="bx bxs-circle text-success me-1"></i>Teslim Edildi</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="#!">#TZ9652</a></td>
+                                            <td>25 April 2024</td>
+                                            <td><a href="#!">Judith H. Fritsche</a></td>
+                                            <td>(+57)-305-5579-759</td>
+                                            <td>SULLIVAN/Kentucky</td>
+                                            <td>Credit Card</td>
+                                            <td><i class="bx bxs-circle text-success me-1"></i>Teslim Edildi</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="#!">#TZ5984</a></td>
+                                            <td>25 April 2024</td>
+                                            <td><a href="#!">Peter T. Smith</a></td>
+                                            <td>(+33)-655-5187-93</td>
+                                            <td>Yreka/California</td>
+                                            <td>Pay Pal</td>
+                                            <td><i class="bx bxs-circle text-success me-1"></i>Teslim Edildi</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="#!">#TZ3625</a></td>
+                                            <td>21 April 2024</td>
+                                            <td><a href="#!">Emmanuel J. Delcid</a></td>
+                                            <td>(+30)-693-5553-637</td>
+                                            <td>Atlanta/Georgia</td>
+                                            <td>Pay Pal</td>
+                                            <td><i class="bx bxs-circle text-primary me-1"></i>Processing</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="#!">#TZ8652</a></td>
+                                            <td>18 April 2024</td>
+                                            <td><a href="#!">William J. Cook</a></td>
+                                            <td>(+91)-855-5446-150</td>
+                                            <td>Rosenberg/Texas</td>
+                                            <td>Credit Card</td>
+                                            <td><i class="bx bxs-circle text-primary me-1"></i>Processing</td>
+											
+                                    
+                                    
+                                </table> <!-- end table -->
+                            </div> <!-- table responsive -->
+                            <div
+                                class="align-items-center justify-content-between row g-0 text-center text-sm-start p-3 border-top">
+                                
+                              
+                            </div>
+                        </div> <!-- end card -->
+                    </div> <!-- end col -->
+                </div> <!-- end row -->
+
+
+            </div>
+            <!-- End Container Fluid -->
+
+            <!-- Footer Start -->
+            <footer class="footer card mb-0 rounded-0 justify-content-center align-items-center">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p class="mb-0">
+                                <script>document.write(new Date().getFullYear())</script> &copy; BinGo Paket</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            <!-- Footer End -->
+
+        </div>
+        <!-- ==================================================== -->
+        <!-- End Page Content -->
+        <!-- ==================================================== -->
+
+    </div>
+    <!-- END Wrapper -->
+
+    <!-- Vendor Javascript -->
+    <script src="assets/js/vendor.min.js"></script>
+
+    <!-- App Javascript -->
+    <script src="assets/js/app.js"></script>
+
+    <!-- Vector Map Js -->
+    <script src="assets/vendor/jsvectormap/js/jsvectormap.min.js"></script>
+    <script src="assets/vendor/jsvectormap/maps/world-merc.js"></script>
+    <script src="assets/vendor/jsvectormap/maps/world.js"></script>
+
+    <!-- Dashboard Js -->
+    <script src="assets/js/pages/dashboard.js"></script>
+
+</body>
+
+</html>
