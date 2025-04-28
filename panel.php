@@ -110,93 +110,16 @@
 
                 <!-- Kurye Talep Ekranı -->
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
                                 <h4>Kurye Talep Ekranı</h4>
                             </div>
                             <div class="card-body">
                                 <!-- Kurye Çağır Butonu -->
-                                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kuryeCagirModal">Kurye Çağır</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Son Eklenen İşletmeler -->
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Son Eklenen İşletmeler</h4>
-                            </div>
-                            <div class="card-body">
-                                Son Eklenen İşletmeler Bu Alana Gelecek
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Eklenen Kuryeler ve Siparişler -->
-                <div class="row">
-                    <!-- Son Eklenen Kuryeler -->
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Son Eklenen Kuryeler</h4>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Tarih</th>
-                                            <th>İsim</th>
-                                            <th>Hesap</th>
-                                            <th>Kullanıcı Adı</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>26 Nisan 2025</td>
-                                            <td>Ahmet YILMAZ</td>
-                                            <td>Doğrulandı</td>
-                                            <td>@ayilmaz</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Son Siparişler -->
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Son Siparişler</h4>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Restaurant</th>
-                                            <th>Tarih</th>
-                                            <th>Müşteri Adı</th>
-                                            <th>Telefon</th>
-                                            <th>Adres</th>
-                                            <th>Ödeme Yöntemi</th>
-                                            <th>Durum</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>#TZ5625</td>
-                                            <td>29 April 2024</td>
-                                            <td>Anna M. Hines</td>
-                                            <td>(+1)-555-1564-261</td>
-                                            <td>Burr Ridge/Illinois</td>
-                                            <td>Credit Card</td>
-                                            <td>Teslim Edildi</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#kuryeCagirModal">
+                                    Kurye Çağır
+                                </button>
                             </div>
                         </div>
                     </div>
