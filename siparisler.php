@@ -4,6 +4,16 @@
 <head>
     <?php
     session_start();
+    // PDO bağlantısı başa alındı, tekrar tekrar açılmasın!
+    $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
+    $username = "oceanweb_kuryeuser";
+    $password = "ko61tu61.";
+    try {
+        $pdo = new PDO($dsn, $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        die("Veritabanı hatası: " . $e->getMessage());
+    }
     ?>
     <!-- Title Meta -->
     <meta charset="utf-8" />
@@ -52,7 +62,6 @@
                                 <iconify-icon icon="solar:hamburger-menu-outline" class="fs-24 align-middle"></iconify-icon>
                             </button>
                         </div>
-
                         <!-- Arama -->
                         <form class="app-search d-none d-md-block me-auto">
                             <div class="position-relative">
@@ -84,7 +93,7 @@
                 <ul class="navbar-nav">
                     <li class="menu-title">MENÜ</li>
                     <li class="nav-item"><a class="nav-link" href="panel.php">Panel</a></li>
-                    <li class="nav-item"><a class="nav-link" href="siparisler.php">Siparişler</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="siparisler.php">Siparişler</a></li>
                     <li class="nav-item"><a class="nav-link" href="isletmeler.php">İşletmeler</a></li>
                     <li class="nav-item"><a class="nav-link" href="kuryeler.php">Kuryeler</a></li>
                     <li class="nav-item"><a class="nav-link" href="rapor.php">Raporlar</a></li>
@@ -107,47 +116,43 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Panelden Gelen Veriler</h4>
+                                <h4>Panelden Gelen Siparişler</h4>
                             </div>
                             <div class="card-body">
                                 <div id="panel-verileri">
                                     <?php
-                                    // Veritabanı bağlantısı
-                                    $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
-                                    $username = "oceanweb_kuryeuser";
-                                    $password = "ko61tu61.";
-
                                     try {
-                                        $pdo = new PDO($dsn, $username, $password);
-                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                                        // Verileri al ve göster
                                         $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
 
                                         echo '<table style="width: 100%; border-collapse: collapse;">';
                                         echo '<tr>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Restoran Adı</th>
                                                 <th style="border: 1px solid #ddd; padding: 8px;">Müşteri Adı</th>
                                                 <th style="border: 1px solid #ddd; padding: 8px;">Telefon</th>
                                                 <th style="border: 1px solid #ddd; padding: 8px;">Adres</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Adres Tarifi</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Sipariş Tutarı</th>
                                                 <th style="border: 1px solid #ddd; padding: 8px;">Ödeme Yöntemi</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Durum</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Tarih</th>
                                                 <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Kurye Ata</th>
                                             </tr>';
 
                                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                             echo '<tr>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['restoran_adi']) . '</td>';
                                             echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_adi']) . '</td>';
                                             echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_telefonu']) . '</td>';
                                             echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_adresi']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['adres_tarifi']) . '</td>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['siparis_tutari']) . '</td>';
                                             echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['odeme_yontemi']) . '</td>';
-
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['durum']) . '</td>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['created_at']) . '</td>';
                                             // Kurye Ata butonu
                                             echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
                                                     <form action="kurye_ata.php" method="POST">
                                                         <input type="hidden" name="id" value="' . htmlspecialchars($row['id']) . '">
-                                                        <button type="submit" class="btn btn-success" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Kurye Ata</button>
+                                                        <button type="submit" class="btn btn-success" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px;">Kurye Ata</button>
                                                     </form>
                                                 </td>';
                                             echo '</tr>';
@@ -164,67 +169,12 @@
                     </div>
                 </div>
 
-                <!-- Yeni Alanlar: Kurye Ekle ve Kuryeler Listesi -->
-                <div class="row mt-4">
-                    <!-- Kuryeler Listesi -->
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header" style="background-color: #007bff; color: white;">
-                                <h4 style="color: white;">Kuryeler Listesi</h4>
-                            </div>
-                            <div class="card-body">
-                                <div style="overflow-y: auto; max-height: 400px;">
-                                    <ul class="list-group">
-                                        <?php
-                                        // Kuryeler veritabanından çekiliyor
-                                        $kuryeQuery = "SELECT * FROM kuryeler";
-                                        $kuryeStmt = $pdo->query($kuryeQuery);
-
-                                        while ($kurye = $kuryeStmt->fetch(PDO::FETCH_ASSOC)) {
-                                            echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                                            echo '<span><strong>Ad Soyad:</strong> ' . htmlspecialchars($kurye['ad_soyad']) . '</span>';
-                                            echo '<span><strong>Telefon:</strong> ' . htmlspecialchars($kurye['telefon']) . '</span>';
-                                            echo '<span><strong>Email:</strong> ' . htmlspecialchars($kurye['email']) . '</span>';
-                                            echo '</li>';
-                                        }
-                                        ?>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kurye Ekle -->
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header" style="background-color: #007bff; color: white;">
-                                <h4 style="color: white;">Kurye Ekle</h4>
-                            </div>
-                            <div class="card-body">
-                                <form action="kurye_ekle.php" method="POST">
-                                    <div class="mb-3">
-                                        <label for="kuryeAdi" class="form-label">Adı Soyadı</label>
-                                        <input type="text" class="form-control" id="kuryeAdi" name="kuryeAdi" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="kuryeTelefon" class="form-label">Telefon Numarası</label>
-                                        <input type="text" class="form-control" id="kuryeTelefon" name="kuryeTelefon" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="kuryeMail" class="form-label">Mail Adresi</label>
-                                        <input type="email" class="form-control" id="kuryeMail" name="kuryeMail" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Kurye Ekle</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+            
                 </div>
-
+                <!-- /Yeni Alanlar -->
             </div>
         </div>
         <!-- Sayfa İçeriği Bitiş -->
-
     </div>
     <!-- Wrapper Bitiş -->
 
@@ -232,5 +182,4 @@
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
-
 </html>
