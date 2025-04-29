@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="utf-8" />
-    <title>Bingo Paket - Sıcak Sıcak Kapında!</title>
+    <title>Bingo Paket - Sıcak Sıcak Kapında !</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Taplox: An advanced, fully responsive admin dashboard template packed with features to streamline your analytics and management needs." />
+    <meta name="author" content="StackBros" />
+    <meta name="keywords" content="Taplox, admin dashboard, responsive template, analytics, modern UI, management tools" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ffffff">
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
     <link rel="stylesheet" href="assets/css/vendor.min.css" />
     <link rel="stylesheet" href="assets/css/icons.min.css" />
     <link rel="stylesheet" href="assets/css/style.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="assets/js/config.js"></script>
 </head>
+
 <body>
     <div class="app-wrapper">
         <header class="app-topbar">
@@ -59,26 +68,48 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4>Kurye Talep Ekranı</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="kurye-bilgileri" class="table-responsive">
-                                    <!-- Dinamik Olarak Yüklenen Tablo -->
-                                    <table class="table table-bordered table-striped">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th>#</th>
+                                <div id="kurye-bilgileri">
+                                    <?php
+                                    $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
+                                    $username = "oceanweb_kuryeuser";
+                                    $password = "ko61tu61.";
+
+                                    try {
+                                        $pdo = new PDO($dsn, $username, $password);
+                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                                        $query = "SELECT * FROM kurye_cagir WHERE durum NOT IN ('Kabul Edildi', 'İptal Edildi') ORDER BY created_at DESC";
+                                        $stmt = $pdo->query($query);
+
+                                        echo '<table style="width: 100%; border-collapse: collapse;">';
+                                        echo '<tr>
                                                 <th>Müşteri Adı</th>
                                                 <th>Telefon</th>
                                                 <th>Adres</th>
                                                 <th>Adres Tarifi</th>
                                                 <th>Ödeme Yöntemi</th>
                                                 <th>Aksiyon</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="kurye-table-body">
-                                            <!-- Veriler Dinamik Olarak Buraya Eklenecek -->
-                                        </tbody>
-                                    </table>
+                                            </tr>';
+
+                                        while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            echo '<tr id="siparis-' . $kurye['id'] . '">';
+                                            echo '<td>' . htmlspecialchars($kurye['musteri_adi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($kurye['musteri_telefonu']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($kurye['musteri_adresi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($kurye['adres_tarifi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
+                                            echo '<td>
+                                                    <button class="btn-kabul" data-id="' . $kurye['id'] . '">Kabul Et</button>
+                                                    <button class="btn-iptal" data-id="' . $kurye['id'] . '">İptal Et</button>
+                                                </td>';
+                                            echo '</tr>';
+                                        }
+
+                                        echo '</table>';
+                                    } catch (PDOException $e) {
+                                        echo "Veritabanı hatası: " . $e->getMessage();
+                                    }
+                                    ?>
                                 </div>
                             </div>
                         </div>
@@ -87,40 +118,9 @@
             </div>
         </div>
     </div>
-
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // Dinamik verileri tabloya yükle
-        function fetchKuryeBilgileri() {
-            fetch('restopanel.php?fetch_kurye_requests=true')
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.getElementById('kurye-table-body');
-                    tableBody.innerHTML = ''; // Önce mevcut veriyi temizle
-
-                    data.forEach((item, index) => {
-                        const row = document.createElement('tr');
-                        row.className = (index % 2 === 0) ? 'table-light' : 'table-secondary'; // Satır renkleri
-                        row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${item.musteri_adi}</td>
-                            <td>${item.telefon}</td>
-                            <td>${item.adres}</td>
-                            <td>${item.adres_tarifi}</td>
-                            <td>${item.odeme_yontemi}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm btn-kabul" data-id="${item.id}">Kabul Et</button>
-                                <button class="btn btn-danger btn-sm btn-iptal" data-id="${item.id}">İptal Et</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Hata:', error));
-        }
-
-        // Kabul Et ve İptal Et butonlarına tıklama işlemi
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-kabul') || e.target.classList.contains('btn-iptal')) {
                 const id = e.target.getAttribute('data-id');
@@ -134,19 +134,15 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
-                        fetchKuryeBilgileri(); // Listeyi yenile
+                        document.getElementById(`siparis-${id}`).remove();
                     } else {
-                        alert('Hata: ' + data.message);
+                        alert(data.message);
                     }
                 })
                 .catch(error => console.error('Hata:', error));
             }
         });
-
-        // İlk yüklemede ve her 5 saniyede bir verileri yenile
-        fetchKuryeBilgileri();
-        setInterval(fetchKuryeBilgileri, 5000);
     </script>
 </body>
+
 </html>
