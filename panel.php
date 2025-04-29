@@ -88,17 +88,21 @@
                                         $pdo = new PDO($dsn, $username, $password);
                                         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+                                        // Güncel alanlara göre sorgu ve başlıklar
                                         $query = "SELECT * FROM kurye_cagir WHERE durum NOT IN ('Kabul Edildi', 'İptal Edildi') ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
 
                                         echo '<table class="table table-striped">';
                                         echo '<thead class="table-dark">
                                                 <tr>
+                                                    <th>Restoran Adı</th>
                                                     <th>Müşteri Adı</th>
                                                     <th>Telefon</th>
                                                     <th>Adres</th>
-                                                    <th>Adres Tarifi</th>
+                                                    <th>Sipariş Tutarı</th>
                                                     <th>Ödeme Yöntemi</th>
+                                                    <th>Durum</th>
+                                                    <th>Tarih</th>
                                                     <th>Aksiyon</th>
                                                 </tr>
                                               </thead>';
@@ -106,11 +110,14 @@
 
                                         while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                             echo '<tr id="siparis-' . $kurye['id'] . '">';
+                                            echo '<td>' . htmlspecialchars($kurye['restoran_adi']) . '</td>';
                                             echo '<td>' . htmlspecialchars($kurye['musteri_adi']) . '</td>';
                                             echo '<td>' . htmlspecialchars($kurye['musteri_telefonu']) . '</td>';
                                             echo '<td>' . htmlspecialchars($kurye['musteri_adresi']) . '</td>';
-                                            echo '<td>' . htmlspecialchars($kurye['adres_tarifi']) . '</td>';
+                                            echo '<td>' . number_format($kurye['siparis_tutari'], 2) . ' ₺</td>';
                                             echo '<td>' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($kurye['durum']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($kurye['created_at']) . '</td>';
                                             echo '<td>
                                                     <button class="btn btn-success btn-kabul" data-id="' . $kurye['id'] . '">Kabul Et</button>
                                                     <button class="btn btn-danger btn-iptal" data-id="' . $kurye['id'] . '">İptal Et</button>
@@ -141,7 +148,7 @@
                                 <?php
                                 try {
                                     // Tüm kuryeleri getir, id yerine kurye_id kullan!
-                                    $query = "SELECT * FROM kuryeler ORDER BY kurye_id DESC";
+                                    $query = "SELECT * FROM kuryeler ORDER BY kurye_id DESC LIMIT 10";
                                     $stmt = $pdo->query($query);
 
                                     echo '<table class="table table-bordered">';
