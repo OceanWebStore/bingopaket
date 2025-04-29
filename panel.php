@@ -21,19 +21,16 @@
 
 <body>
     <div class="app-wrapper">
-          <!-- Topbar Başlangıç -->
+        <!-- Topbar Başlangıç -->
         <header class="app-topbar">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <div class="d-flex align-items-center gap-2">
-                        <!-- Menü Düğmesi -->
                         <div class="topbar-item">
                             <button type="button" class="button-toggle-menu topbar-button">
                                 <iconify-icon icon="solar:hamburger-menu-outline" class="fs-24 align-middle"></iconify-icon>
                             </button>
                         </div>
-
-                        <!-- Arama -->
                         <form class="app-search d-none d-md-block me-auto">
                             <div class="position-relative">
                                 <input type="search" class="form-control" placeholder="Arama Yap" autocomplete="off" value="">
@@ -45,6 +42,7 @@
             </div>
         </header>
         <!-- Topbar Bitiş -->
+
         <div class="app-sidebar">
             <div class="scrollbar" data-simplebar>
                 <div class="logo-box">
@@ -73,11 +71,13 @@
                 <div class="page-title-box">
                     <h4>Panel</h4>
                 </div>
+
+                <!-- Kurye Talep Ekranı -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Kurye Talep Ekranı</h4>
+                                <h5>Kurye Talep Ekranı</h5>
                                 <div id="kurye-bilgileri">
                                     <?php
                                     $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
@@ -135,12 +135,13 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Kuryeler Listesi</h4>
+                                <h5>Eklenen Son 10 Kurye</h5>
                             </div>
                             <div class="card-body">
                                 <?php
                                 try {
-                                    $query = "SELECT * FROM kuryeler";
+                                    // Tüm kuryeleri getir, id yerine kurye_id kullan!
+                                    $query = "SELECT * FROM kuryeler ORDER BY kurye_id DESC";
                                     $stmt = $pdo->query($query);
 
                                     echo '<table class="table table-bordered">';
@@ -149,6 +150,8 @@
                                                 <th>ID</th>
                                                 <th>Kurye Adı</th>
                                                 <th>Telefon</th>
+                                                <th>Mail</th>
+                                                <th>Adres</th>
                                                 <th>Durum</th>
                                             </tr>
                                           </thead>';
@@ -156,9 +159,11 @@
 
                                     while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                         echo '<tr>';
-                                        echo '<td>' . htmlspecialchars($kurye['id']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['kurye_id']) . '</td>';
                                         echo '<td>' . htmlspecialchars($kurye['kurye_adi']) . '</td>';
                                         echo '<td>' . htmlspecialchars($kurye['telefon']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['mail_adresi']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['kurye_adresi']) . '</td>';
                                         echo '<td>' . htmlspecialchars($kurye['durum']) . '</td>';
                                         echo '</tr>';
                                     }
@@ -190,6 +195,14 @@
                                     <div class="mb-3">
                                         <label for="telefon" class="form-label">Telefon</label>
                                         <input type="text" class="form-control" id="telefon" name="telefon" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="mailAdresi" class="form-label">Mail Adresi</label>
+                                        <input type="email" class="form-control" id="mailAdresi" name="mailAdresi" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="kuryeAdresi" class="form-label">Adres</label>
+                                        <textarea class="form-control" id="kuryeAdresi" name="kuryeAdresi" rows="2" required></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Ekle</button>
                                 </form>
@@ -226,7 +239,7 @@
             }
         });
 
-        // 5 saniyede bir verileri yenile
+        // 5 saniyede bir Kurye Talep Ekranı verilerini yenile
         setInterval(() => {
             fetch('panel.php')
                 .then(response => response.text())
