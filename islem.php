@@ -31,7 +31,17 @@ if ($islem && $id) {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Islem Basariyla Tamamlandi']);
+            // Kabul Edilen siparişleri loglamak veya başka işlemler yapmak için ek kod eklenebilir
+            if ($islem === 'kabul') {
+                // Kabul edilen siparişi log dosyasına yazdırabilir veya farklı bir tabloya taşıyabilirsiniz.
+                // Örnek: Loglama
+                $logQuery = "INSERT INTO siparis_log (siparis_id, durum, created_at) VALUES (:id, 'Kabul Edildi', NOW())";
+                $logStmt = $pdo->prepare($logQuery);
+                $logStmt->bindParam(':id', $id, PDO::PARAM_INT);
+                $logStmt->execute();
+            }
+
+            echo json_encode(['success' => true, 'message' => 'İşlem Başarıyla Tamamlandı']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Veritabanı hatası']);
         }
