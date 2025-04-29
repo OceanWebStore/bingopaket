@@ -4,12 +4,6 @@
 <head>
     <?php
     session_start();
-
-    // Giriş kontrolü devredışı bırakıldı
-    // if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    //     header('Location: giris-yap.php');
-    //     exit;
-    // }
     ?>
     <!-- Title Meta -->
     <meta charset="utf-8" />
@@ -105,79 +99,123 @@
 
                 <!-- Sayfa Başlığı -->
                 <div class="page-title-box">
-                    <h4>Panel</h4>
+                    <h4>Siparişler</h4>
                 </div>
 
-                <!-- Kurye Talep Ekranı -->
+                <!-- Panel.php Verilerini Göster -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-    <h4>Kurye Talep Ekranı</h4>
-    <!-- Dinamik veri buraya yazılacak -->
-    <div id="kurye-bilgileri">
-        <?php
-        // Veritabanı bağlantısı
-        $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
-        $username = "oceanweb_kuryeuser"; // Veritabanı kullanıcı adı
-        $password = "ko61tu61."; // Veritabanı şifresi
-
-        try {
-            $pdo = new PDO($dsn, $username, $password);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Tüm kayıtları al
-            $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
-            $stmt = $pdo->query($query);
-
-            echo '<table style="width: 100%; border-collapse: collapse;">';
-            echo '<tr>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Müşteri Adı</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Telefon</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Adres</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Adres Tarifi</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Ödeme Yöntemi</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">Aksiyon</th>
-                  </tr>';
-
-           while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    echo '<tr>';
-    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adi']) . '</td>';
-    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_telefonu']) . '</td>';
-    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['musteri_adresi']) . '</td>';
-    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['adres_tarifi']) . '</td>';
-    echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
-
-    // Form tabanlı butonları buraya ekliyorsunuz
-    echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
-            <!-- Kabul Et Butonu -->
-            <form action="islem.php" method="POST" style="display:inline;">
-                <input type="hidden" name="islem" value="kabul">
-                <input type="hidden" name="id" value="' . htmlspecialchars($kurye['id']) . '">
-                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; margin-right: 5px; border-radius: 5px; cursor: pointer;">Kabul Et</button>
-            </form>
-
-            <!-- İptal Et Butonu -->
-            <form action="islem.php" method="POST" style="display:inline;">
-                <input type="hidden" name="islem" value="iptal">
-                <input type="hidden" name="id" value="' . htmlspecialchars($kurye['id']) . '">
-                <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">İptal Et</button>
-            </form>
-          </td>';
-    echo '</tr>';
-}
-
-            echo '</table>';
-
-        } catch (PDOException $e) {
-            echo "Veritabanı hatası: " . $e->getMessage();
-        }
-        ?>
-    </div>
-</div>
+                                <h4>Panelden Gelen Veriler</h4>
                             </div>
                             <div class="card-body">
-                                <!-- "Kurye Çağır" butonu ve ilgili pop-up kaldırıldı -->
+                                <div id="panel-verileri">
+                                    <?php
+                                    // Veritabanı bağlantısı
+                                    $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
+                                    $username = "oceanweb_kuryeuser";
+                                    $password = "ko61tu61.";
+
+                                    try {
+                                        $pdo = new PDO($dsn, $username, $password);
+                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                                        // Verileri al ve göster
+                                        $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
+                                        $stmt = $pdo->query($query);
+
+                                        echo '<table style="width: 100%; border-collapse: collapse;">';
+                                        echo '<tr>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Müşteri Adı</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Telefon</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Adres</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Adres Tarifi</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px;">Ödeme Yöntemi</th>
+                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Kurye Ata</th>
+                                            </tr>';
+
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            echo '<tr>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_adi']) . '</td>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_telefonu']) . '</td>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_adresi']) . '</td>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['adres_tarifi']) . '</td>';
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['odeme_yontemi']) . '</td>';
+
+                                            // Kurye Ata butonu
+                                            echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                                                    <form action="kurye_ata.php" method="POST">
+                                                        <input type="hidden" name="id" value="' . htmlspecialchars($row['id']) . '">
+                                                        <button type="submit" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Kurye Ata</button>
+                                                    </form>
+                                                </td>';
+                                            echo '</tr>';
+                                        }
+
+                                        echo '</table>';
+                                    } catch (PDOException $e) {
+                                        echo "Veritabanı hatası: " . $e->getMessage();
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yeni Alanlar: Kurye Ekle ve Kuryeler Listesi -->
+<div class="row mt-4">
+    <!-- Kuryeler Listesi -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4>Kuryeler Listesi</h4>
+            </div>
+            <div class="card-body">
+                <div style="overflow-y: auto; max-height: 400px;">
+                    <ul class="list-group">
+                        <?php
+                        // Kuryeler veritabanından çekiliyor
+                        $kuryeQuery = "SELECT * FROM kuryeler";
+                        $kuryeStmt = $pdo->query($kuryeQuery);
+
+                        while ($kurye = $kuryeStmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo '<li class="list-group-item">';
+                            echo '<p><strong>Ad Soyad:</strong> ' . htmlspecialchars($kurye['ad_soyad']) . '</p>';
+                            echo '<p><strong>Telefon:</strong> ' . htmlspecialchars($kurye['telefon']) . '</p>';
+                            echo '<p><strong>Email:</strong> ' . htmlspecialchars($kurye['email']) . '</p>';
+                            echo '</li>';
+                        }
+                        ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    <!-- Kurye Ekle -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h4>Kurye Ekle</h4>
+                            </div>
+                            <div class="card-body">
+                                <form action="kurye_ekle.php" method="POST">
+                                    <div class="mb-3">
+                                        <label for="kuryeAdi" class="form-label">Adı Soyadı</label>
+                                        <input type="text" class="form-control" id="kuryeAdi" name="kuryeAdi" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="kuryeTelefon" class="form-label">Telefon Numarası</label>
+                                        <input type="text" class="form-control" id="kuryeTelefon" name="kuryeTelefon" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="kuryeMail" class="form-label">Mail Adresi</label>
+                                        <input type="email" class="form-control" id="kuryeMail" name="kuryeMail" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger">Kurye Ekle</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -193,22 +231,6 @@
     <!-- Vendor Javascript -->
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
-<!-- Mevcut dosyanın sonlarına eklenmelidir -->
-<script>
-    setInterval(() => {
-        fetch('panel.php')
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const newContent = doc.querySelector('#kurye-bilgileri').innerHTML;
-
-                document.getElementById('kurye-bilgileri').innerHTML = newContent;
-            })
-            .catch(error => console.error('Hata:', error));
-    }, 5000); // 5 saniyede bir güncelle
-</script>
-</body>
 </body>
 
 </html>
