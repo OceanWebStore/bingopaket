@@ -8,28 +8,61 @@ try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Veritabanı bağlantı hatası: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => "Veritabanı bağlantı hatası: " . $e->getMessage()]);
+    exit;
 }
 
 // POST isteği kontrolü
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (isset($data['musteriAdi'], $data['musteriTelefonu'], $data['musteriAdresi'], $data['adresTarifi'], $data['odemeYontemi'])) {
-        $query = "INSERT INTO kurye_cagir (musteri_adi, musteri_telefonu, musteri_adresi, adres_tarifi, odeme_yontemi)
-                  VALUES (:musteriAdi, :musteriTelefonu, :musteriAdresi, :adresTarifi, :odemeYontemi)";
-        
+    // Yeni alanlarla kontrol
+    if (
+        isset(
+            $data['restoranAdi'],
+            $data['musteriAdi'],
+            $data['musteriTelefonu'],
+            $data['musteriAdresi'],
+            $data['siparisTutari'],
+            $data['odemeYontemi']
+        )
+        && $data['restoranAdi'] !== ''
+        && $data['musteriAdi'] !== ''
+        && $data['musteriTelefonu'] !== ''
+        && $data['musteriAdresi'] !== ''
+        && $data['siparisTutari'] !== ''
+        && $data['odemeYontemi'] !== ''
+    ) {
+        $query = "INSERT INTO kurye_cagir (
+            restoran_adi, 
+            musteri_adi, 
+            musteri_telefonu, 
+            musteri_adresi, 
+            siparis_tutari, 
+            odeme_yontemi, 
+            created_at
+        ) VALUES (
+            :restoranAdi, 
+            :musteriAdi, 
+            :musteriTelefonu, 
+            :musteriAdresi, 
+            :siparisTutari, 
+            :odemeYontemi, 
+            NOW()
+        )";
+
         $stmt = $pdo->prepare($query);
         $stmt->execute([
-            ':musteriAdi' => $data['musteriAdi'],
-            ':musteriTelefonu' => $data['musteriTelefonu'],
-            ':musteriAdresi' => $data['musteriAdresi'],
-            ':adresTarifi' => $data['adresTarifi'],
-            ':odemeYontemi' => $data['odemeYontemi']
+            ':restoranAdi'      => $data['restoranAdi'],
+            ':musteriAdi'       => $data['musteriAdi'],
+            ':musteriTelefonu'  => $data['musteriTelefonu'],
+            ':musteriAdresi'    => $data['musteriAdresi'],
+            ':siparisTutari'    => $data['siparisTutari'],
+            ':odemeYontemi'     => $data['odemeYontemi']
         ]);
 
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Eksik veri']);
+        echo json_encode(['success' => false, 'message' => 'Eksik veya hatalı veri.']);
     }
 }
