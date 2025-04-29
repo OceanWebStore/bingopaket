@@ -147,7 +147,7 @@
                                             echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
                                                     <form action="kurye_ata.php" method="POST">
                                                         <input type="hidden" name="id" value="' . htmlspecialchars($row['id']) . '">
-                                                        <button type="submit" class="btn btn-danger" style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Kurye Ata</button>
+                                                        <button type="submit" class="btn btn-success" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Kurye Ata</button>
                                                     </form>
                                                 </td>';
                                             echo '</tr>';
@@ -165,60 +165,60 @@
                 </div>
 
                 <!-- Yeni Alanlar: Kurye Ekle ve Kuryeler Listesi -->
-<div class="row mt-4">
-    <!-- Kuryeler Listesi -->
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header bg-danger text-white">
-                <h4>Kuryeler Listesi</h4>
-            </div>
-            <div class="card-body">
-                <div style="overflow-y: auto; max-height: 400px;">
-                    <ul class="list-group">
-                        <?php
-                        // Kuryeler veritabanından çekiliyor
-                        $kuryeQuery = "SELECT * FROM kuryeler";
-                        $kuryeStmt = $pdo->query($kuryeQuery);
+                <div class="row mt-4">
+                    <!-- Kuryeler Listesi -->
+                   <div class="col-lg-6">
+    <div class="card">
+        <div class="card-header" style="background-color: #007bff; color: white;">
+            <h4>Kuryeler Listesi</h4>
+        </div>
+        <div class="card-body">
+            <div style="overflow-y: auto; max-height: 400px;">
+                <ul class="list-group">
+                    <?php
+                    // Kuryeler veritabanından çekiliyor
+                    $kuryeQuery = "SELECT * FROM kuryeler";
+                    $kuryeStmt = $pdo->query($kuryeQuery);
 
-                        while ($kurye = $kuryeStmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo '<li class="list-group-item">';
-                            echo '<p><strong>Ad Soyad:</strong> ' . htmlspecialchars($kurye['ad_soyad']) . '</p>';
-                            echo '<p><strong>Telefon:</strong> ' . htmlspecialchars($kurye['telefon']) . '</p>';
-                            echo '<p><strong>Email:</strong> ' . htmlspecialchars($kurye['email']) . '</p>';
-                            echo '</li>';
-                        }
-                        ?>
-                    </ul>
-                </div>
+                    while ($kurye = $kuryeStmt->fetch(PDO::FETCH_ASSOC)) {
+                        echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                        echo '<span><strong>Ad Soyad:</strong> ' . htmlspecialchars($kurye['ad_soyad']) . '</span>';
+                        echo '<span><strong>Telefon:</strong> ' . htmlspecialchars($kurye['telefon']) . '</span>';
+                        echo '<span><strong>Email:</strong> ' . htmlspecialchars($kurye['email']) . '</span>';
+                        echo '</li>';
+                    }
+                    ?>
+                </ul>
             </div>
         </div>
     </div>
+</div>
 
                     <!-- Kurye Ekle -->
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header bg-danger text-white">
-                                <h4>Kurye Ekle</h4>
-                            </div>
-                            <div class="card-body">
-                                <form action="kurye_ekle.php" method="POST">
-                                    <div class="mb-3">
-                                        <label for="kuryeAdi" class="form-label">Adı Soyadı</label>
-                                        <input type="text" class="form-control" id="kuryeAdi" name="kuryeAdi" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="kuryeTelefon" class="form-label">Telefon Numarası</label>
-                                        <input type="text" class="form-control" id="kuryeTelefon" name="kuryeTelefon" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="kuryeMail" class="form-label">Mail Adresi</label>
-                                        <input type="email" class="form-control" id="kuryeMail" name="kuryeMail" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-danger">Kurye Ekle</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                   <div class="col-lg-6">
+    <div class="card">
+        <div class="card-header" style="background-color: #007bff; color: white;">
+            <h4>Kurye Ekle</h4>
+        </div>
+        <div class="card-body">
+            <form action="kurye_ekle.php" method="POST">
+                <div class="mb-3">
+                    <label for="kuryeAdi" class="form-label">Adı Soyadı</label>
+                    <input type="text" class="form-control" id="kuryeAdi" name="kuryeAdi" required>
+                </div>
+                <div class="mb-3">
+                    <label for="kuryeTelefon" class="form-label">Telefon Numarası</label>
+                    <input type="text" class="form-control" id="kuryeTelefon" name="kuryeTelefon" required>
+                </div>
+                <div class="mb-3">
+                    <label for="kuryeMail" class="form-label">Mail Adresi</label>
+                    <input type="email" class="form-control" id="kuryeMail" name="kuryeMail" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Kurye Ekle</button>
+            </form>
+        </div>
+    </div>
+</div>
                 </div>
 
             </div>
