@@ -89,11 +89,11 @@
 
                 <ul class="navbar-nav">
                     <li class="menu-title">MENÜ</li>
-                    <li class="nav-item"><a class="nav-link" href="panel.html">Panel</a></li>
-                    <li class="nav-item"><a class="nav-link" href="siparisler.html">Siparişler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="isletmeler.html">İşletmeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="kuryeler.html">Kuryeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="rapor.html">Raporlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="panel.php">Panel</a></li>
+                    <li class="nav-item"><a class="nav-link" href="siparisler.php">Siparişler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="isletmeler.php">İşletmeler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="kuryeler.php">Kuryeler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="rapor.php">Raporlar</a></li>
                 </ul>
             </div>
         </div>
