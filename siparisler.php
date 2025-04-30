@@ -23,7 +23,6 @@
 
 <body>
     <div class="app-wrapper">
-        <!-- Topbar -->
         <header class="app-topbar">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -44,7 +43,6 @@
             </div>
         </header>
 
-        <!-- Sol Menü -->
         <div class="app-sidebar">
             <div class="scrollbar" data-simplebar>
                 <div class="logo-box">
@@ -57,7 +55,6 @@
                         <img src="assets/images/logo-light.png" class="logo-lg" alt="Logo Light">
                     </a>
                 </div>
-
                 <ul class="navbar-nav">
                     <li class="menu-title">MENÜ</li>
                     <li class="nav-item"><a class="nav-link" href="panel.php">Panel</a></li>
@@ -69,7 +66,6 @@
             </div>
         </div>
 
-        <!-- Sayfa İçeriği -->
         <div class="page-content">
             <div class="container-fluid">
                 <div class="page-title-box">
@@ -85,46 +81,53 @@
                             </div>
                             <div class="card-body">
                                 <?php
-                                // Yalnızca "Atandı" durumunda olmayan siparişleri getir
                                 $query = "SELECT * FROM kurye_cagir WHERE durum != 'Atandı' ORDER BY created_at DESC";
                                 $stmt = $pdo->query($query);
                                 ?>
-
-                                <?php if ($stmt->rowCount() > 0): ?>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Restoran Adı</th>
-                                                <th>Müşteri Adı</th>
-                                                <th>Telefon</th>
-                                                <th>Adres</th>
-                                                <th>Sipariş Tutarı</th>
-                                                <th>Ödeme Yöntemi</th>
-                                                <th>Durum</th>
-                                                <th>Kurye Ata</th>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Restoran Adı</th>
+                                            <th>Müşteri Adı</th>
+                                            <th>Telefon</th>
+                                            <th>Adres</th>
+                                            <th>Sipariş Tutarı</th>
+                                            <th>Ödeme Yöntemi</th>
+                                            <th>Durum</th>
+                                            <th>Kurye Ata</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+                                            <tr data-siparis-id="<?= $row['id'] ?>">
+                                                <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
+                                                <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
+                                                <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
+                                                <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
+                                                <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
+                                                <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
+                                                <td><?= htmlspecialchars($row['durum']) ?></td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#kuryeAtaModal" data-siparis-id="<?= $row['id'] ?>">Kurye Ata</button>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                                                <tr data-siparis-id="<?= $row['id'] ?>">
-                                                    <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
-                                                    <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
-                                                    <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['durum']) ?></td>
-                                                    <td>
-                                                        <!-- Kurye Ata Butonu -->
-                                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#kuryeAtaModal" data-siparis-id="<?= $row['id'] ?>">Kurye Ata</button>
-                                                    </td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        </tbody>
-                                    </table>
-                                <?php else: ?>
-                                    <p>Görüntülenecek sipariş bulunmamaktadır.</p>
-                                <?php endif; ?>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sipariş Aksiyon Alanı -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Sipariş Aksiyon Alanı</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Bu alan ileride aksiyonlar için kullanılacaktır.</p>
                             </div>
                         </div>
                     </div>
@@ -163,55 +166,13 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Javascript -->
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
-    <script>
-        document.addEventListener('submit', function(event) {
-            if (event.target.matches('form[action="kurye_ata.php"]')) {
-                event.preventDefault();
-                const form = event.target;
-                const formData = new FormData(form);
-
-                fetch('kurye_ata.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeAtaModal'));
-                        modal.hide();
-
-                        const siparisId = formData.get('siparis_id');
-                        const siparisRow = document.querySelector(`tr[data-siparis-id="${siparisId}"]`);
-                        if (siparisRow) {
-                            siparisRow.remove();
-                        }
-
-                        alert(data.message);
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Hata:', error);
-                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                });
-            }
-        });
-
-        var kuryeAtaModal = document.getElementById('kuryeAtaModal');
-        kuryeAtaModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var siparisId = button.getAttribute('data-siparis-id');
-            document.getElementById('siparisIdInput').value = siparisId;
-        });
-    </script>
 </body>
 
 </html>
