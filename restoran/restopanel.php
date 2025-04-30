@@ -10,6 +10,25 @@
     //     header('Location: giris-yap.php');
     //     exit;
     // }
+
+    // Restoran Bilgileri ÇEKME
+    $restoranAdi = "";
+    $restoranIletisim = "";
+    $restoranAdres = "";
+
+    try {
+        $pdo = new PDO("mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4", "oceanweb_kuryeuser", "ko61tu61.");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Son eklenen restoranı al
+        $stmt = $pdo->query("SELECT * FROM restoranlar ORDER BY id DESC LIMIT 1");
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $restoranAdi = htmlspecialchars($row['restoran_adi']);
+            $restoranIletisim = htmlspecialchars($row['restoran_iletisim']);
+            $restoranAdres = htmlspecialchars($row['restoran_adres']);
+        }
+    } catch (PDOException $e) {
+        // Bağlantı hatası varsa inputlar boş kalsın
+    }
     ?>
     <!-- Title Meta -->
     <meta charset="utf-8" />
@@ -41,6 +60,8 @@
 
     <!-- Theme Config js -->
     <script src="assets/js/config.js"></script>
+    <!-- Bootstrap Icons CDN for motor icon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -108,28 +129,52 @@
                     <h4>Panel</h4>
                 </div>
 
-                <!-- Kurye Talep Ekranı -->
+                <!-- Kurye Talep Ekranı ve Restoran Bilgileri -->
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
                                 <h4>Kurye Talep Ekranı</h4>
                             </div>
-                            <div class="card-body">
-                                <!-- Kurye Çağır Butonu -->
-                                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#kuryeCagirModal">Kurye Çağır</button>
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                <div class="mb-3 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="#007bff" class="bi bi-truck-front" viewBox="0 0 16 16">
+                                      <path d="M4 9a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm8 1a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-9-2V8c0-1.35.79-2.5 2-3.16V2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2.84A3.001 3.001 0 0 1 13 8v1h1.5a.5.5 0 0 1 .5.5V12a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2H7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2V9.5a.5.5 0 0 1 .5-.5H3zm1-1h8v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v1zm-1 3.5v.5a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-.5H4zm8 0v.5a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-.5h-3z"/>
+                                    </svg>
+                                </div>
+                                <button class="btn btn-primary btn-lg px-5 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#kuryeCagirModal" style="font-size: 1.5rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" class="bi bi-truck-front me-2" viewBox="0 0 16 16">
+                                      <path d="M4 9a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm8 1a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-9-2V8c0-1.35.79-2.5 2-3.16V2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2.84A3.001 3.001 0 0 1 13 8v1h1.5a.5.5 0 0 1 .5.5V12a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2H7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2V9.5a.5.5 0 0 1 .5-.5H3zm1-1h8v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v1zm-1 3.5v.5a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-.5H4zm8 0v.5a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-.5h-3z"/>
+                                    </svg>
+                                    Kurye Çağır
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Son Eklenen İşletmeler -->
+                    <!-- Restoran Bilgileri -->
                     <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Son Eklenen İşletmeler</h4>
+                                <h4>Restoran Bilgileri</h4>
                             </div>
                             <div class="card-body">
-                                Son Eklenen İşletmeler Bu Alana Gelecek
+                                <form id="restoranBilgileriForm">
+                                    <div class="mb-3">
+                                        <label for="restoranAdi" class="form-label">Restoran Adı</label>
+                                        <input type="text" class="form-control" id="restoranAdi" name="restoranAdi" placeholder="Restoran Adı" required value="<?php echo $restoranAdi; ?>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="restoranIletisim" class="form-label">Restoran İletişim No</label>
+                                        <input type="text" class="form-control" id="restoranIletisim" name="restoranIletisim" placeholder="İletişim Numarası" required value="<?php echo $restoranIletisim; ?>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="restoranAdres" class="form-label">Restoran Adresi</label>
+                                        <textarea class="form-control" id="restoranAdres" name="restoranAdres" rows="2" placeholder="Adres" required><?php echo $restoranAdres; ?></textarea>
+                                    </div>
+                                    <button type="submit" class="btn" style="background-color:#007bff; color:#fff;">Kaydet</button>
+                                </form>
+                                <div id="restoranKayitSonuc" style="margin-top:10px;"></div>
                             </div>
                         </div>
                     </div>
@@ -220,6 +265,10 @@
                 <form id="kuryeCagirForm">
                     <div class="modal-body">
                         <div class="mb-3">
+                            <label class="form-label">Restoran Adı</label>
+                            <input type="text" class="form-control" id="modalRestoranAdi" value="<?php echo $restoranAdi; ?>" readonly style="background:#f8f9fa;">
+                        </div>
+                        <div class="mb-3">
                             <label for="musteriAdi" class="form-label">Müşteri Adı</label>
                             <input type="text" class="form-control" id="musteriAdi" placeholder="Müşteri Adı" required>
                         </div>
@@ -232,18 +281,27 @@
                             <textarea class="form-control" id="musteriAdresi" rows="2" placeholder="Müşteri Adresi" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="adresTarifi" class="form-label">Adres Tarifi</label>
-                            <textarea class="form-control" id="adresTarifi" rows="2" placeholder="Adres Tarifi"></textarea>
+                            <label for="siparisTutari" class="form-label">Sipariş Tutarı</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="siparisTutari" placeholder="₺" required>
                         </div>
                         <div class="mb-3">
-                            <label for="odemeYontemi" class="form-label">Ödeme Yöntemi</label>
-                            <select class="form-select" id="odemeYontemi" required>
-                                <option value="">Ödeme Yöntemi Seçin</option>
-                                <option value="Online Ödeme">Online Ödeme</option>
-                                <option value="Nakit">Nakit</option>
-                                <option value="Kapıda Kredi Kartı">Kapıda Kredi Kartı</option>
-                                <option value="Kapıda Yemek Kartı">Kapıda Yemek Kartı</option>
-                            </select>
+                            <label class="form-label d-block">Ödeme Yöntemi</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="odemeYontemi" id="odemeNakit" value="Nakit" required>
+                                <label class="form-check-label" for="odemeNakit">Nakit</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="odemeYontemi" id="odemeOnlineKredi" value="Online Kredi Kartı" required>
+                                <label class="form-check-label" for="odemeOnlineKredi">Online Kredi Kartı</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="odemeYontemi" id="odemeKapidaKredi" value="Kapıda Kredi Kartı" required>
+                                <label class="form-check-label" for="odemeKapidaKredi">Kapıda Kredi Kartı</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="odemeYontemi" id="odemeKapidaYemek" value="Kapıda Yemek Kartı" required>
+                                <label class="form-check-label" for="odemeKapidaYemek">Kapıda Yemek Kartı</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -260,84 +318,84 @@
     <script src="assets/js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-
-    <!-- Form Submit Handler -->
+    <!-- Kurye Çağır Formu JS -->
     <script>
         document.getElementById('kuryeCagirForm').addEventListener('submit', function(event) {
             event.preventDefault();
+            const restoranAdi = document.getElementById('modalRestoranAdi').value;
             const musteriAdi = document.getElementById('musteriAdi').value;
             const musteriTelefonu = document.getElementById('musteriTelefonu').value;
             const musteriAdresi = document.getElementById('musteriAdresi').value;
-            const adresTarifi = document.getElementById('adresTarifi').value;
-            const odemeYontemi = document.getElementById('odemeYontemi').value;
+            const siparisTutari = document.getElementById('siparisTutari').value;
+            const odemeYontemi = document.querySelector('input[name="odemeYontemi"]:checked') ? document.querySelector('input[name="odemeYontemi"]:checked').value : "";
 
-            console.log('Kurye Çağrısı Yapıldı:', {
-                musteriAdi,
-                musteriTelefonu,
-                musteriAdresi,
-                adresTarifi,
-                odemeYontemi
+            fetch('../update_panel.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    restoranAdi,
+                    musteriAdi,
+                    musteriTelefonu,
+                    musteriAdresi,
+                    siparisTutari,
+                    odemeYontemi
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Sesli bildirim
+                    const msg = new SpeechSynthesisUtterance(`Bingo Kurye Çağrısı Oluşturuldu. Kısa Süre İçerisinde Kuryemiz Kapınızda !!`);
+                    window.speechSynthesis.speak(msg);
+
+                    alert('Kurye çağrısı başarıyla oluşturuldu!');
+                } else {
+                    alert('Bir hata oluştu.');
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
             });
 
-            alert('Kurye çağrısı başarıyla oluşturuldu!');
+            // Modalı kapat
             const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeCagirModal'));
             modal.hide();
         });
     </script>
-    <!-- Vendor Javascript -->
-<script src="assets/js/vendor.min.js"></script>
-<script src="assets/js/app.js"></script>
 
-<!-- Form Submit Handler -->
-<script>
-    document.getElementById('kuryeCagirForm').addEventListener('submit', function(event) {
+    <!-- Restoran Bilgileri Formu JS -->
+    <script>
+    document.getElementById('restoranBilgileriForm').addEventListener('submit', function(event) {
         event.preventDefault();
+        const restoranAdi = document.getElementById('restoranAdi').value;
+        const restoranIletisim = document.getElementById('restoranIletisim').value;
+        const restoranAdres = document.getElementById('restoranAdres').value;
 
-        // Form verilerini al
-        const musteriAdi = document.getElementById('musteriAdi').value;
-        const musteriTelefonu = document.getElementById('musteriTelefonu').value;
-        const musteriAdresi = document.getElementById('musteriAdresi').value;
-        const adresTarifi = document.getElementById('adresTarifi').value;
-        const odemeYontemi = document.getElementById('odemeYontemi').value;
-
-        // Veriyi sunucuya gönder
-        fetch('../update_panel.php', {
+        fetch('../restoran_kaydet.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                musteriAdi,
-                musteriTelefonu,
-                musteriAdresi,
-                adresTarifi,
-                odemeYontemi
+                restoranAdi,
+                restoranIletisim,
+                restoranAdres
             })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Sesli bildirim
-                const msg = new SpeechSynthesisUtterance(`Kurye çağrısı başarıyla oluşturuldu!`);
-                window.speechSynthesis.speak(msg);
-                
-
-                alert('Kurye çağrısı başarıyla oluşturuldu!');
+            const sonucDiv = document.getElementById('restoranKayitSonuc');
+            if(data.success){
+                sonucDiv.innerHTML = '<span style="color:green;">Restoran başarıyla kaydedildi.</span>';
+                // Form reset edilmez, bilgiler ekranda kalır.
             } else {
-                alert('Bir hata oluştu.');
+                sonucDiv.innerHTML = '<span style="color:red;">' + (data.message || 'Kayıt sırasında hata oluştu.') + '</span>';
             }
         })
-        .catch(error => {
-            console.error('Hata:', error);
+        .catch(() => {
+            document.getElementById('restoranKayitSonuc').innerHTML = '<span style="color:red;">Bir hata oluştu.</span>';
         });
-
-        // Modalı kapat
-        const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeCagirModal'));
-        modal.hide();
     });
-</script>
+    </script>
 </body>
-</html>
-</body>
-
 </html>
