@@ -4,7 +4,6 @@
 <head>
     <?php
     session_start();
-    // PDO bağlantısı başa alındı, tekrar tekrar açılmasın!
     $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
     $username = "oceanweb_kuryeuser";
     $password = "ko61tu61.";
@@ -15,43 +14,16 @@
         die("Veritabanı hatası: " . $e->getMessage());
     }
     ?>
-    <!-- Title Meta -->
     <meta charset="utf-8" />
-    <title>Bingo Paket - Sıcak Sıcak Kapında !</title>
+    <title>Bingo Paket - Siparişler</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Taplox: An advanced, fully responsive admin dashboard template packed with features to streamline your analytics and management needs." />
-    <meta name="author" content="StackBros" />
-    <meta name="keywords" content="Taplox, admin dashboard, responsive template, analytics, modern UI, management tools" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#ffffff">
-
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Google Font Family link -->
-    <link rel="preconnect" href="https://fonts.googleapis.com/">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap" rel="stylesheet">
-
-    <!-- Vendor css -->
     <link href="assets/css/vendor.min.css" rel="stylesheet" type="text/css" />
-
-    <!-- Icons css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-
-    <!-- App css -->
     <link href="assets/css/style.min.css" rel="stylesheet" type="text/css" />
-
-    <!-- Theme Config js -->
-    <script src="assets/js/config.js"></script>
 </head>
 
 <body>
-    <!-- START Wrapper -->
     <div class="app-wrapper">
-
-        <!-- Topbar Başlangıç -->
+        <!-- Topbar -->
         <header class="app-topbar">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -73,18 +45,17 @@
                 </div>
             </div>
         </header>
-        <!-- Topbar Bitiş -->
 
         <!-- Sol Menü -->
         <div class="app-sidebar">
             <div class="scrollbar" data-simplebar>
                 <!-- Logo -->
                 <div class="logo-box">
-                    <a href="panel.html" class="logo-dark">
+                    <a href="panel.php" class="logo-dark">
                         <img src="assets/images/logo-sm.png" class="logo-sm" alt="Logo Small">
                         <img src="assets/images/logo-dark.png" class="logo-lg" alt="Logo Dark">
                     </a>
-                    <a href="panel.html" class="logo-light">
+                    <a href="panel.php" class="logo-light">
                         <img src="assets/images/logo-sm.png" class="logo-sm" alt="Logo Small">
                         <img src="assets/images/logo-light.png" class="logo-lg" alt="Logo Light">
                     </a>
@@ -100,18 +71,15 @@
                 </ul>
             </div>
         </div>
-        <!-- Sol Menü Bitiş -->
 
         <!-- Sayfa İçeriği -->
         <div class="page-content">
             <div class="container-fluid">
-
-                <!-- Sayfa Başlığı -->
                 <div class="page-title-box">
                     <h4>Siparişler</h4>
                 </div>
 
-                <!-- Panel.php Verilerini Göster -->
+                <!-- Sipariş Tablosu -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
@@ -119,67 +87,98 @@
                                 <h4>Panelden Gelen Siparişler</h4>
                             </div>
                             <div class="card-body">
-                                <div id="panel-verileri">
-                                    <?php
-                                    try {
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Restoran Adı</th>
+                                            <th>Müşteri Adı</th>
+                                            <th>Telefon</th>
+                                            <th>Adres</th>
+                                            <th>Sipariş Tutarı</th>
+                                            <th>Ödeme Yöntemi</th>
+                                            <th>Durum</th>
+                                            <th>Kurye Ata</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
                                         $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
-
-                                        echo '<table style="width: 100%; border-collapse: collapse;">';
-                                        echo '<tr>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Restoran Adı</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Müşteri Adı</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Telefon</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Adres</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Sipariş Tutarı</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Ödeme Yöntemi</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Durum</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px;">Tarih</th>
-                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Kurye Ata</th>
-                                            </tr>';
-
                                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                            echo '<tr>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['restoran_adi']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_adi']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_telefonu']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['musteri_adresi']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['siparis_tutari']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['odeme_yontemi']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['durum']) . '</td>';
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px;">' . htmlspecialchars($row['created_at']) . '</td>';
-                                            // Kurye Ata butonu
-                                            echo '<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
-                                                    <form action="kurye_ata.php" method="POST">
-                                                        <input type="hidden" name="id" value="' . htmlspecialchars($row['id']) . '">
-                                                        <button type="submit" class="btn btn-success" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px;">Kurye Ata</button>
-                                                    </form>
-                                                </td>';
-                                            echo '</tr>';
-                                        }
-
-                                        echo '</table>';
-                                    } catch (PDOException $e) {
-                                        echo "Veritabanı hatası: " . $e->getMessage();
-                                    }
-                                    ?>
-                                </div>
+                                        ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($row['restoran_adi']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['musteri_adi']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['musteri_telefonu']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['musteri_adresi']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['siparis_tutari']); ?> TL</td>
+                                                <td><?php echo htmlspecialchars($row['odeme_yontemi']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['durum']); ?></td>
+                                                <td>
+                                                    <!-- Kurye Ata Butonu -->
+                                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#kuryeAtaModal" data-siparis-id="<?php echo $row['id']; ?>" data-odeme-yontemi="<?php echo htmlspecialchars($row['odeme_yontemi']); ?>">Kurye Ata</button>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
 
-            
+                <!-- Kurye Ata Modal -->
+                <div class="modal fade" id="kuryeAtaModal" tabindex="-1" aria-labelledby="kuryeAtaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="kuryeAtaModalLabel">Kurye Ata</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="kurye_ata.php" method="POST">
+                                <div class="modal-body">
+                                    <input type="hidden" name="siparis_id" id="siparisIdInput">
+                                    <input type="hidden" name="odeme_yontemi" id="odemeYontemiInput">
+                                    <div class="mb-3">
+                                        <label for="kuryeSec" class="form-label">Kuryeler</label>
+                                        <select class="form-select" name="kurye_id" id="kuryeSec" required>
+                                            <option value="" disabled selected>Kurye Seçin</option>
+                                            <?php
+                                            $kuryeQuery = "SELECT kurye_id, ad_soyad FROM kuryeler";
+                                            $kuryeStmt = $pdo->query($kuryeQuery);
+                                            while ($kurye = $kuryeStmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo '<option value="' . htmlspecialchars($kurye['kurye_id']) . '">' . htmlspecialchars($kurye['ad_soyad']) . '</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                    <button type="submit" class="btn btn-primary">Paketi Ata</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <!-- /Yeni Alanlar -->
             </div>
         </div>
-        <!-- Sayfa İçeriği Bitiş -->
     </div>
-    <!-- Wrapper Bitiş -->
 
-    <!-- Vendor Javascript -->
+    <!-- Javascript -->
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
+    <script>
+        // Modal açıldığında sipariş ID'sini ve ödeme yöntemini gizli inputlara ekle
+        var kuryeAtaModal = document.getElementById('kuryeAtaModal');
+        kuryeAtaModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var siparisId = button.getAttribute('data-siparis-id');
+            var odemeYontemi = button.getAttribute('data-odeme-yontemi');
+            document.getElementById('siparisIdInput').value = siparisId;
+            document.getElementById('odemeYontemiInput').value = odemeYontemi;
+        });
+    </script>
 </body>
+
 </html>
