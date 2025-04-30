@@ -133,6 +133,53 @@
                     </div>
                 </div>
 
+                <!-- Sonuçlanan Siparişler -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Sonuçlanan Siparişler</h4>
+                            </div>
+                            <div class="card-body">
+                                <?php
+                                $query = "SELECT * FROM kurye_cagir WHERE durum = 'Teslim Edildi' ORDER BY updated_at DESC";
+                                $stmt = $pdo->query($query);
+                                ?>
+                                <?php if ($stmt->rowCount() > 0): ?>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Restoran Adı</th>
+                                                <th>Müşteri Adı</th>
+                                                <th>Telefon</th>
+                                                <th>Adres</th>
+                                                <th>Sipariş Tutarı</th>
+                                                <th>Ödeme Yöntemi</th>
+                                                <th>Teslim Tarihi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
+                                                    <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
+                                                    <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['updated_at']) ?></td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
+                                <?php else: ?>
+                                    <p>Sonuçlanan sipariş bulunmamaktadır.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Kurye Ata Modal -->
                 <div class="modal fade" id="kuryeAtaModal" tabindex="-1" aria-labelledby="kuryeAtaModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -166,7 +213,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
