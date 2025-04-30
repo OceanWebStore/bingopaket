@@ -148,30 +148,32 @@
                                 <?php
                                 try {
                                     // Tüm kuryeleri getir, id yerine kurye_id kullan!
-                                    $query = "SELECT * FROM kuryeler ORDER BY kurye_id DESC LIMIT 10";
+                                    $query = "SELECT * FROM kuryeler ORDER BY id DESC LIMIT 10";
                                     $stmt = $pdo->query($query);
 
                                     echo '<table class="table table-bordered">';
                                     echo '<thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Kurye Adı</th>
-                                                <th>Telefon</th>
-                                                <th>Mail</th>
-                                                <th>Adres</th>
-                                                <th>Durum</th>
+                                            <th>Ad Soyad</th>
+                                            <th>Telefon</th>
+                                            <th>Mail</th>
+                                            <th>Adres</th>
+                                            <th>Durum</th>
+                                            <th>Kayıt Tarihi</th>
                                             </tr>
                                           </thead>';
                                     echo '<tbody>';
 
                                     while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                         echo '<tr>';
-                                        echo '<td>' . htmlspecialchars($kurye['kurye_id']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['kurye_adi']) . '</td>';
+                                      echo '<td>' . htmlspecialchars($kurye['kurye_id']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['ad_soyad']) . '</td>';
                                         echo '<td>' . htmlspecialchars($kurye['telefon']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['mail_adresi']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['kurye_adresi']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['mail']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['adres']) . '</td>';
                                         echo '<td>' . htmlspecialchars($kurye['durum']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($kurye['kayit_tarihi']) . '</td>';
                                         echo '</tr>';
                                     }
 
