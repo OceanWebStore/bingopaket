@@ -87,41 +87,47 @@
                                 <h4>Panelden Gelen Siparişler</h4>
                             </div>
                             <div class="card-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Restoran Adı</th>
-                                            <th>Müşteri Adı</th>
-                                            <th>Telefon</th>
-                                            <th>Adres</th>
-                                            <th>Sipariş Tutarı</th>
-                                            <th>Ödeme Yöntemi</th>
-                                            <th>Durum</th>
-                                            <th>Kurye Ata</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
-                                        $stmt = $pdo->query($query);
-                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        ?>
+                                <?php
+                                // Sadece kuryesi atanmamış siparişleri çek (NULL veya 0 olanlar)
+                                $query = "SELECT * FROM kurye_cagir WHERE kurye_id IS NULL OR kurye_id = 0 ORDER BY created_at DESC";
+                                $stmt = $pdo->query($query);
+                                ?>
+
+                                <?php if ($stmt->rowCount() > 0): ?>
+                                    <table class="table">
+                                        <thead>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($row['restoran_adi']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['musteri_adi']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['musteri_telefonu']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['musteri_adresi']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['siparis_tutari']); ?> TL</td>
-                                                <td><?php echo htmlspecialchars($row['odeme_yontemi']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['durum']); ?></td>
-                                                <td>
-                                                    <!-- Kurye Ata Butonu -->
-                                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#kuryeAtaModal" data-siparis-id="<?php echo $row['id']; ?>" data-odeme-yontemi="<?php echo htmlspecialchars($row['odeme_yontemi']); ?>">Kurye Ata</button>
-                                                </td>
+                                                <th>Restoran Adı</th>
+                                                <th>Müşteri Adı</th>
+                                                <th>Telefon</th>
+                                                <th>Adres</th>
+                                                <th>Sipariş Tutarı</th>
+                                                <th>Ödeme Yöntemi</th>
+                                                <th>Durum</th>
+                                                <th>Kurye Ata</th>
                                             </tr>
-                                        <?php } ?>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
+                                                    <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
+                                                    <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
+                                                    <td><?= htmlspecialchars($row['durum']) ?></td>
+                                                    <td>
+                                                        <!-- Kurye Ata Butonu -->
+                                                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#kuryeAtaModal" data-siparis-id="<?= $row['id'] ?>">Kurye Ata</button>
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
+                                <?php else: ?>
+                                    <p>Görüntülenecek sipariş bulunmamaktadır. Lütfen yeni siparişler bekleyin veya sorgunuzu kontrol edin.</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -138,7 +144,6 @@
                             <form action="kurye_ata.php" method="POST">
                                 <div class="modal-body">
                                     <input type="hidden" name="siparis_id" id="siparisIdInput">
-                                    <input type="hidden" name="odeme_yontemi" id="odemeYontemiInput">
                                     <div class="mb-3">
                                         <label for="kuryeSec" class="form-label">Kuryeler</label>
                                         <select class="form-select" name="kurye_id" id="kuryeSec" required>
@@ -169,14 +174,12 @@
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // Modal açıldığında sipariş ID'sini ve ödeme yöntemini gizli inputlara ekle
+        // Modal açıldığında sipariş ID'sini gizli inputa ekle
         var kuryeAtaModal = document.getElementById('kuryeAtaModal');
         kuryeAtaModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
             var siparisId = button.getAttribute('data-siparis-id');
-            var odemeYontemi = button.getAttribute('data-odeme-yontemi');
             document.getElementById('siparisIdInput').value = siparisId;
-            document.getElementById('odemeYontemiInput').value = odemeYontemi;
         });
     </script>
 </body>
