@@ -28,13 +28,11 @@
             <div class="container-fluid">
                 <div class="navbar-header">
                     <div class="d-flex align-items-center gap-2">
-                        <!-- Menü Düğmesi -->
                         <div class="topbar-item">
                             <button type="button" class="button-toggle-menu topbar-button">
                                 <iconify-icon icon="solar:hamburger-menu-outline" class="fs-24 align-middle"></iconify-icon>
                             </button>
                         </div>
-                        <!-- Arama -->
                         <form class="app-search d-none d-md-block me-auto">
                             <div class="position-relative">
                                 <input type="search" class="form-control" placeholder="Arama Yap" autocomplete="off" value="">
@@ -49,7 +47,6 @@
         <!-- Sol Menü -->
         <div class="app-sidebar">
             <div class="scrollbar" data-simplebar>
-                <!-- Logo -->
                 <div class="logo-box">
                     <a href="panel.php" class="logo-dark">
                         <img src="assets/images/logo-sm.png" class="logo-sm" alt="Logo Small">
@@ -88,8 +85,8 @@
                             </div>
                             <div class="card-body">
                                 <?php
-                                // Sadece kuryesi atanmamış siparişleri çek (NULL veya 0 olanlar)
-                                $query = "SELECT * FROM kurye_cagir WHERE kurye_id IS NULL OR kurye_id = 0 ORDER BY created_at DESC";
+                                // Yalnızca "Atandı" durumunda olmayan siparişleri getir
+                                $query = "SELECT * FROM kurye_cagir WHERE durum != 'Atandı' ORDER BY created_at DESC";
                                 $stmt = $pdo->query($query);
                                 ?>
 
@@ -109,7 +106,7 @@
                                         </thead>
                                         <tbody>
                                             <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                                                <tr>
+                                                <tr data-siparis-id="<?= $row['id'] ?>">
                                                     <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
                                                     <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
                                                     <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
@@ -126,7 +123,7 @@
                                         </tbody>
                                     </table>
                                 <?php else: ?>
-                                    <p>Görüntülenecek sipariş bulunmamaktadır. Lütfen yeni siparişler bekleyin veya sorgunuzu kontrol edin.</p>
+                                    <p>Görüntülenecek sipariş bulunmamaktadır.</p>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -174,7 +171,40 @@
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // Modal açıldığında sipariş ID'sini gizli inputa ekle
+        document.addEventListener('submit', function(event) {
+            if (event.target.matches('form[action="kurye_ata.php"]')) {
+                event.preventDefault();
+                const form = event.target;
+                const formData = new FormData(form);
+
+                fetch('kurye_ata.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeAtaModal'));
+                        modal.hide();
+
+                        const siparisId = formData.get('siparis_id');
+                        const siparisRow = document.querySelector(`tr[data-siparis-id="${siparisId}"]`);
+                        if (siparisRow) {
+                            siparisRow.remove();
+                        }
+
+                        alert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                });
+            }
+        });
+
         var kuryeAtaModal = document.getElementById('kuryeAtaModal');
         kuryeAtaModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
