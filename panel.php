@@ -5,13 +5,6 @@
     <meta charset="utf-8" />
     <title>Bingo Paket - Sıcak Sıcak Kapında !</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Taplox: An advanced, fully responsive admin dashboard template packed with features to streamline your analytics and management needs." />
-    <meta name="author" content="StackBros" />
-    <meta name="keywords" content="Taplox, admin dashboard, responsive template, analytics, modern UI, management tools" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#ffffff">
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
     <link rel="stylesheet" href="assets/css/vendor.min.css" />
     <link rel="stylesheet" href="assets/css/icons.min.css" />
     <link rel="stylesheet" href="assets/css/style.min.css" />
@@ -88,19 +81,18 @@
                                         $pdo = new PDO($dsn, $username, $password);
                                         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                                        // Güncel alanlara göre sorgu ve başlıklar
                                         $query = "SELECT * FROM kurye_cagir WHERE durum NOT IN ('Kabul Edildi', 'İptal Edildi') ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
 
-                                        echo '<table class="table table-striped">';
+                                        echo '<table class="table table-striped" id="siparis-listesi">';
                                         echo '<thead class="table-dark">
                                                 <tr>
-                                                    <th>Restoran Adı</th>
-                                                    <th>Müşteri Adı</th>
+                                                    <th>Restoran</th>
+                                                    <th>Müşteri</th>
                                                     <th>Telefon</th>
                                                     <th>Adres</th>
-                                                    <th>Sipariş Tutarı</th>
-                                                    <th>Ödeme Yöntemi</th>
+                                                    <th>Tutar</th>
+                                                    <th>Yöntem</th>
                                                     <th>Durum</th>
                                                     <th>Tarih</th>
                                                     <th>Aksiyon</th>
@@ -139,46 +131,52 @@
             </div>
         </div>
     </div>
+
+    <audio id="notification-sound" src="assets/sounds/notification.mp3"></audio>
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // Siparişleri her 5 saniyede bir yenile
-        setInterval(() => {
-            fetch('panel.php')
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newContent = doc.querySelector('#kurye-bilgileri').innerHTML;
+        // Yeni siparişleri kontrol etmek için her 5 saniyede bir çalıştır
+        let latestOrderId = 0; // En son sipariş ID'sini tutar
 
-                    // Yeni içeriği DOM'a ekle
-                    document.getElementById('kurye-bilgileri').innerHTML = newContent;
+        setInterval(() => {
+            fetch('check_new_orders.php') // Yeni siparişleri kontrol eden PHP dosyası
+                .then(response => response.json())
+                .then(data => {
+                    if (data.newOrders && data.orders.length > 0) {
+                        const siparisListesi = document.querySelector('#siparis-listesi tbody');
+                        const notificationSound = document.getElementById('notification-sound');
+
+                        data.orders.forEach(order => {
+                            if (order.id > latestOrderId) {
+                                latestOrderId = order.id;
+
+                                // Yeni siparişi tabloya ekle
+                                const newRow = document.createElement('tr');
+                                newRow.innerHTML = `
+                                    <td>${order.restoran_adi}</td>
+                                    <td>${order.musteri_adi}</td>
+                                    <td>${order.musteri_telefonu}</td>
+                                    <td>${order.musteri_adresi}</td>
+                                    <td>${order.siparis_tutari} ₺</td>
+                                    <td>${order.odeme_yontemi}</td>
+                                    <td>${order.durum}</td>
+                                    <td>${order.created_at}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-kabul" data-id="${order.id}">Kabul Et</button>
+                                        <button class="btn btn-danger btn-iptal" data-id="${order.id}">İptal Et</button>
+                                    </td>
+                                `;
+                                siparisListesi.appendChild(newRow);
+
+                                // Sesli bildirim çal
+                                notificationSound.play();
+                            }
+                        });
+                    }
                 })
                 .catch(error => console.error('Hata:', error));
         }, 5000);
-
-        document.addEventListener('click', function (e) {
-            if (e.target.classList.contains('btn-iptal')) {
-                const id = e.target.getAttribute('data-id');
-
-                if (confirm('Bu siparişi tamamen silmek istediğinizden emin misiniz?')) {
-                    fetch('sil.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById(`siparis-${id}`).remove();
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => console.error('Hata:', error));
-                }
-            }
-        });
     </script>
 </body>
 
