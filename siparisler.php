@@ -25,6 +25,19 @@
             echo "<div class='alert alert-danger'>Sipariş silinirken bir hata oluştu!</div>";
         }
     }
+
+    // Sipariş Kabul İşlemi
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kabul_et'])) {
+        $siparisId = $_POST['siparis_id'] ?? null;
+        if ($siparisId) {
+            // Sipariş durumunu güncelle
+            $stmt = $pdo->prepare("UPDATE kurye_cagir SET durum = 'Kabul Edildi' WHERE id = :id");
+            $stmt->execute([':id' => $siparisId]);
+            echo "<center><div class='alert alert-success'>Sipariş başarıyla kabul edildi!</div></center>";
+        } else {
+            echo "<div class='alert alert-danger'>Sipariş kabul edilirken bir hata oluştu!</div>";
+        }
+    }
     ?>
     <meta charset="utf-8" />
     <title>Bingo Paket - Siparişler</title>
@@ -96,7 +109,7 @@
                             </div>
                             <div class="card-body">
                                 <?php
-                                $query = "SELECT * FROM kurye_cagir WHERE durum != 'Atandı' ORDER BY created_at DESC";
+                                $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
                                 $stmt = $pdo->query($query);
                                 ?>
                                 <table class="table">
@@ -109,8 +122,7 @@
                                             <th>Sipariş Tutarı</th>
                                             <th>Ödeme Yöntemi</th>
                                             <th>Durum</th>
-                                            <th>Kurye Ata</th>
-                                            <th>Sil</th>
+                                            <th>Kabul Et</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -124,12 +136,9 @@
                                                 <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
                                                 <td><?= htmlspecialchars($row['durum']) ?></td>
                                                 <td>
-                                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#kuryeAtaModal" data-siparis-id="<?= $row['id'] ?>">Kurye Ata</button>
-                                                </td>
-                                                <td>
-                                                    <form action="" method="POST" style="display:inline-block;">
+                                                    <form action="" method="POST">
                                                         <input type="hidden" name="siparis_id" value="<?= $row['id'] ?>">
-                                                        <button type="submit" name="sil" class="btn btn-danger btn-sm">Sil</button>
+                                                        <button type="submit" name="kabul_et" class="btn btn-success btn-sm">Kabul Et</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -148,14 +157,6 @@
 
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
-    <script>
-        document.addEventListener('click', function (event) {
-            if (event.target.matches('[data-bs-target="#kuryeAtaModal"]')) {
-                const siparisId = event.target.getAttribute('data-siparis-id');
-                document.getElementById('siparisIdInput').value = siparisId;
-            }
-        });
-    </script>
 </body>
 
 </html>
