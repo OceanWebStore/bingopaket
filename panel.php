@@ -17,9 +17,7 @@
         <!-- Topbar -->
         <header class="app-topbar">
             <div class="container-fluid">
-                <div class="navbar-header">
-                    <h4>Kurye Paneli</h4>
-                </div>
+                
             </div>
         </header>
 
@@ -125,61 +123,59 @@
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        function fetchSiparisler() {
-            fetch('check_new_orders.php')
+        // 5 saniyede bir yeni siparişleri kontrol et
+        setInterval(() => {
+            fetch('fetch_new_orders.php') // Yeni siparişleri kontrol eden bir PHP dosyası
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const siparisListesi = document.querySelector('#siparis-listesi tbody');
-                        siparisListesi.innerHTML = ''; // Mevcut içerikleri temizle
-
-                        // Yeni siparişleri listeye ekle
                         data.orders.forEach(order => {
-                            const row = document.createElement('tr');
-                            row.id = `siparis-${order.id}`;
-                            row.innerHTML = `
-                                <td>${order.restoran_adi}</td>
-                                <td>${order.musteri_adi}</td>
-                                <td>${order.musteri_telefonu}</td>
-                                <td>${order.musteri_adresi}</td>
-                                <td>${order.siparis_tutari} ₺</td>
-                                <td>${order.odeme_yontemi}</td>
-                                <td>${order.durum}</td>
-                                <td>
-                                    <button class="btn btn-success btn-kabul" data-id="${order.id}">Kabul Et</button>
-                                    <button class="btn btn-danger btn-sil" data-id="${order.id}">Sil</button>
-                                </td>
-                            `;
-                            siparisListesi.appendChild(row);
+                            if (!document.getElementById(`siparis-${order.id}`)) {
+                                // Yeni siparişleri ekle
+                                const row = document.createElement('tr');
+                                row.id = `siparis-${order.id}`;
+                                row.innerHTML = `
+                                    <td>${order.restoran_adi}</td>
+                                    <td>${order.musteri_adi}</td>
+                                    <td>${order.musteri_telefonu}</td>
+                                    <td>${order.musteri_adresi}</td>
+                                    <td>${order.siparis_tutari} ₺</td>
+                                    <td>${order.odeme_yontemi}</td>
+                                    <td>${order.durum}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-kabul" data-id="${order.id}">Kabul Et</button>
+                                        <button class="btn btn-danger btn-sil" data-id="${order.id}">Sil</button>
+                                    </td>
+                                `;
+                                siparisListesi.appendChild(row);
+                            }
                         });
                     }
                 })
-                .catch(error => console.error('Siparişleri getirirken hata oluştu:', error));
-        }
+                .catch(error => console.error('Yeni siparişler alınırken hata oluştu:', error));
+        }, 5000);
 
-        fetchSiparisler(); // Sayfa yüklendiğinde siparişleri getir
-        setInterval(fetchSiparisler, 5000); // Her 5 saniyede bir siparişleri güncelle
-
+        // Kabul Et ve Sil butonları için click event
         document.addEventListener('click', function (event) {
             if (event.target.classList.contains('btn-kabul')) {
                 const siparisId = event.target.dataset.id;
 
-                fetch('update_order_status.php', {
+                fetch('accept_order.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: siparisId })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById(`siparis-${siparisId}`).remove();
-                            alert('Sipariş kabul edildi.');
-                        } else {
-                            alert('Hata: ' + data.message);
-                        }
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`siparis-${siparisId}`).remove();
+                        alert('Sipariş Kabul Edildi.');
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => console.error('Kabul işlemi başarısız:', error));
             }
 
             if (event.target.classList.contains('btn-sil')) {
@@ -187,23 +183,23 @@
 
                 fetch('delete_order.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: siparisId })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById(`siparis-${siparisId}`).remove();
-                            alert('Sipariş silindi.');
-                        } else {
-                            alert('Hata: ' + data.message);
-                        }
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`siparis-${siparisId}`).remove();
+                        alert('Sipariş silindi.');
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => console.error('Silme işlemi başarısız:', error));
             }
         });
     </script>
+    
 </body>
 
 </html>
