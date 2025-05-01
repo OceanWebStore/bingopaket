@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Bingo Paket - Sıcak Sıcak Kapında !</title>
+    <title>Bingo Paket - Kurye Paneli</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/vendor.min.css" />
     <link rel="stylesheet" href="assets/css/icons.min.css" />
@@ -14,28 +14,16 @@
 
 <body>
     <div class="app-wrapper">
-        <!-- Topbar Başlangıç -->
+        <!-- Topbar -->
         <header class="app-topbar">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="topbar-item">
-                            <button type="button" class="button-toggle-menu topbar-button">
-                                <iconify-icon icon="solar:hamburger-menu-outline" class="fs-24 align-middle"></iconify-icon>
-                            </button>
-                        </div>
-                        <form class="app-search d-none d-md-block me-auto">
-                            <div class="position-relative">
-                                <input type="search" class="form-control" placeholder="Arama Yap" autocomplete="off" value="">
-                                <iconify-icon icon="solar:magnifer-outline" class="search-widget-icon"></iconify-icon>
-                            </div>
-                        </form>
-                    </div>
+                    <h4>Kurye Paneli</h4>
                 </div>
             </div>
         </header>
-        <!-- Topbar Bitiş -->
 
+        <!-- Sidebar -->
         <div class="app-sidebar">
             <div class="scrollbar" data-simplebar>
                 <div class="logo-box">
@@ -50,55 +38,63 @@
                 </div>
                 <ul class="navbar-nav">
                     <li class="menu-title">MENÜ</li>
-                    <li class="nav-item"><a class="nav-link" href="panel.php">Panel</a></li>
-                    <li class="nav-item"><a class="nav-link" href="siparisler.php">Siparişler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="isletmeler.php">İşletmeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="kuryeler.php">Kuryeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="rapor.php">Raporlar</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="panel.php">
+                            <i class="iconify" data-icon="mdi:view-dashboard-outline"></i> Panel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="siparisler.php">
+                            <i class="iconify" data-icon="mdi:cart-outline"></i> Siparişler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="isletmeler.php">
+                            <i class="iconify" data-icon="mdi:storefront-outline"></i> İşletmeler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="kuryeler.php">
+                            <i class="iconify" data-icon="mdi:moped-outline"></i> Kuryeler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="rapor.php">
+                            <i class="iconify" data-icon="mdi:file-chart-outline"></i> Raporlar
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
 
+        <!-- Content -->
         <div class="page-content">
             <div class="container-fluid">
-                <div class="page-title-box">
-                    <h4>Panel</h4>
-                </div>
-
-                <!-- Kurye Talep Ekranı -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5>Kurye Talep Ekranı</h5>
-                                <div id="kurye-bilgileri">
-                                    <?php
-                                    $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
-                                    $username = "oceanweb_kuryeuser";
-                                    $password = "ko61tu61.";
-
-                                    try {
-                                        $pdo = new PDO($dsn, $username, $password);
-                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                                        $query = "SELECT * FROM kurye_cagir WHERE durum NOT IN ('Kabul Edildi', 'İptal Edildi') ORDER BY created_at DESC";
+                                <h5>Panelden Gelen Siparişler</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped" id="siparis-listesi">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Restoran</th>
+                                            <th>Müşteri</th>
+                                            <th>Telefon</th>
+                                            <th>Adres</th>
+                                            <th>Tutar</th>
+                                            <th>Yöntem</th>
+                                            <th>Durum</th>
+                                            <th>Aksiyon</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        require 'db.php'; // Veritabanı bağlantısı
+                                        $query = "SELECT * FROM kurye_cagir WHERE durum = 'Beklemede' ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
-
-                                        echo '<table class="table table-striped" id="siparis-listesi">';
-                                        echo '<thead class="table-dark">
-                                                <tr>
-                                                    <th>Restoran</th>
-                                                    <th>Müşteri</th>
-                                                    <th>Telefon</th>
-                                                    <th>Adres</th>
-                                                    <th>Tutar</th>
-                                                    <th>Yöntem</th>
-                                                    <th>Durum</th>
-                                                    <th>Tarih</th>
-                                                    <th>Aksiyon</th>
-                                                </tr>
-                                              </thead>';
-                                        echo '<tbody>';
 
                                         while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                             echo '<tr id="siparis-' . $kurye['id'] . '">';
@@ -109,21 +105,15 @@
                                             echo '<td>' . number_format($kurye['siparis_tutari'], 2) . ' ₺</td>';
                                             echo '<td>' . htmlspecialchars($kurye['odeme_yontemi']) . '</td>';
                                             echo '<td>' . htmlspecialchars($kurye['durum']) . '</td>';
-                                            echo '<td>' . htmlspecialchars($kurye['created_at']) . '</td>';
                                             echo '<td>
                                                     <button class="btn btn-success btn-kabul" data-id="' . $kurye['id'] . '">Kabul Et</button>
-                                                    <button class="btn btn-danger btn-iptal" data-id="' . $kurye['id'] . '">İptal Et</button>
+                                                    <button class="btn btn-danger btn-sil" data-id="' . $kurye['id'] . '">Sil</button>
                                                   </td>';
                                             echo '</tr>';
                                         }
-
-                                        echo '</tbody>';
-                                        echo '</table>';
-                                    } catch (PDOException $e) {
-                                        echo "Veritabanı hatası: " . $e->getMessage();
-                                    }
-                                    ?>
-                                </div>
+                                        ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -132,51 +122,87 @@
         </div>
     </div>
 
-    <audio id="notification-sound" src="assets/sounds/notification.mp3"></audio>
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // Yeni siparişleri kontrol etmek için her 5 saniyede bir çalıştır
-        let latestOrderId = 0; // En son sipariş ID'sini tutar
-
-        setInterval(() => {
-            fetch('check_new_orders.php') // Yeni siparişleri kontrol eden PHP dosyası
+        function fetchSiparisler() {
+            fetch('check_new_orders.php')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.newOrders && data.orders.length > 0) {
+                    if (data.success) {
                         const siparisListesi = document.querySelector('#siparis-listesi tbody');
-                        const notificationSound = document.getElementById('notification-sound');
+                        siparisListesi.innerHTML = ''; // Mevcut içerikleri temizle
 
+                        // Yeni siparişleri listeye ekle
                         data.orders.forEach(order => {
-                            if (order.id > latestOrderId) {
-                                latestOrderId = order.id;
-
-                                // Yeni siparişi tabloya ekle
-                                const newRow = document.createElement('tr');
-                                newRow.innerHTML = `
-                                    <td>${order.restoran_adi}</td>
-                                    <td>${order.musteri_adi}</td>
-                                    <td>${order.musteri_telefonu}</td>
-                                    <td>${order.musteri_adresi}</td>
-                                    <td>${order.siparis_tutari} ₺</td>
-                                    <td>${order.odeme_yontemi}</td>
-                                    <td>${order.durum}</td>
-                                    <td>${order.created_at}</td>
-                                    <td>
-                                        <button class="btn btn-success btn-kabul" data-id="${order.id}">Kabul Et</button>
-                                        <button class="btn btn-danger btn-iptal" data-id="${order.id}">İptal Et</button>
-                                    </td>
-                                `;
-                                siparisListesi.appendChild(newRow);
-
-                                // Sesli bildirim çal
-                                notificationSound.play();
-                            }
+                            const row = document.createElement('tr');
+                            row.id = `siparis-${order.id}`;
+                            row.innerHTML = `
+                                <td>${order.restoran_adi}</td>
+                                <td>${order.musteri_adi}</td>
+                                <td>${order.musteri_telefonu}</td>
+                                <td>${order.musteri_adresi}</td>
+                                <td>${order.siparis_tutari} ₺</td>
+                                <td>${order.odeme_yontemi}</td>
+                                <td>${order.durum}</td>
+                                <td>
+                                    <button class="btn btn-success btn-kabul" data-id="${order.id}">Kabul Et</button>
+                                    <button class="btn btn-danger btn-sil" data-id="${order.id}">Sil</button>
+                                </td>
+                            `;
+                            siparisListesi.appendChild(row);
                         });
                     }
                 })
-                .catch(error => console.error('Hata:', error));
-        }, 5000);
+                .catch(error => console.error('Siparişleri getirirken hata oluştu:', error));
+        }
+
+        fetchSiparisler(); // Sayfa yüklendiğinde siparişleri getir
+        setInterval(fetchSiparisler, 5000); // Her 5 saniyede bir siparişleri güncelle
+
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('btn-kabul')) {
+                const siparisId = event.target.dataset.id;
+
+                fetch('update_order_status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: siparisId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`siparis-${siparisId}`).remove();
+                            alert('Sipariş kabul edildi.');
+                        } else {
+                            alert('Hata: ' + data.message);
+                        }
+                    });
+            }
+
+            if (event.target.classList.contains('btn-sil')) {
+                const siparisId = event.target.dataset.id;
+
+                fetch('delete_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: siparisId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`siparis-${siparisId}`).remove();
+                            alert('Sipariş silindi.');
+                        } else {
+                            alert('Hata: ' + data.message);
+                        }
+                    });
+            }
+        });
     </script>
 </body>
 
