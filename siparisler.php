@@ -14,33 +14,18 @@
         die("Veritabanı hatası: " . $e->getMessage());
     }
 
-    // Sipariş Silme İşlemi
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sil'])) {
-        $siparisId = $_POST['siparis_id'] ?? null;
-        if ($siparisId) {
-            $stmt = $pdo->prepare("DELETE FROM kurye_cagir WHERE id = :id");
-            $stmt->execute([':id' => $siparisId]);
-            echo "<center><div class='alert alert-success'>Sipariş başarıyla silindi!</div></center>";
-        } else {
-            echo "<div class='alert alert-danger'>Sipariş silinirken bir hata oluştu!</div>";
-        }
-    }
-
-    // Sipariş Kabul İşlemi
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kabul_et'])) {
-        $siparisId = $_POST['siparis_id'] ?? null;
-        if ($siparisId) {
-            // Sipariş durumunu güncelle
-            $stmt = $pdo->prepare("UPDATE kurye_cagir SET durum = 'Kabul Edildi' WHERE id = :id");
-            $stmt->execute([':id' => $siparisId]);
-            echo "<center><div class='alert alert-success'>Sipariş başarıyla kabul edildi!</div></center>";
-        } else {
-            echo "<div class='alert alert-danger'>Sipariş kabul edilirken bir hata oluştu!</div>";
-        }
+    // Panelden gelen sipariş verisini al
+    $siparis = null;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['siparis_id'])) {
+        $siparisId = $_POST['siparis_id'];
+        // Sipariş bilgilerini getir
+        $stmt = $pdo->prepare("SELECT restoran_adi, musteri_adi, musteri_telefonu, musteri_adresi, siparis_tutari, odeme_yontemi FROM kurye_cagir WHERE id = :id");
+        $stmt->execute([':id' => $siparisId]);
+        $siparis = $stmt->fetch(PDO::FETCH_ASSOC);
     }
     ?>
     <meta charset="utf-8" />
-    <title>Bingo Paket - Siparişler</title>
+    <title>Bingo Paket - Sipariş Detayı</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="assets/css/vendor.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.min.css" rel="stylesheet" type="text/css" />
@@ -48,115 +33,61 @@
 
 <body>
     <div class="app-wrapper">
-        <!-- Topbar -->
         <header class="app-topbar">
             <div class="container-fluid">
-                <div class="navbar-header">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="topbar-item">
-                            <button type="button" class="button-toggle-menu topbar-button">
-                                <iconify-icon icon="solar:hamburger-menu-outline" class="fs-24 align-middle"></iconify-icon>
-                            </button>
-                        </div>
-                        <form class="app-search d-none d-md-block me-auto">
-                            <div class="position-relative">
-                                <input type="search" class="form-control" placeholder="Arama Yap" autocomplete="off" value="">
-                                <iconify-icon icon="solar:magnifer-outline" class="search-widget-icon"></iconify-icon>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <h4>Sipariş Detayı</h4>
             </div>
         </header>
 
-        <!-- Sidebar -->
-        <div class="app-sidebar">
-            <div class="scrollbar" data-simplebar>
-                <div class="logo-box">
-                    <a href="panel.php" class="logo-dark">
-                        <img src="assets/images/logo-sm.png" class="logo-sm" alt="Logo Small">
-                        <img src="assets/images/logo-dark.png" class="logo-lg" alt="Logo Dark">
-                    </a>
-                    <a href="panel.php" class="logo-light">
-                        <img src="assets/images/logo-sm.png" class="logo-sm" alt="Logo Small">
-                        <img src="assets/images/logo-light.png" class="logo-lg" alt="Logo Light">
-                    </a>
-                </div>
-                <ul class="navbar-nav">
-                    <li class="menu-title">MENÜ</li>
-                    <li class="nav-item"><a class="nav-link" href="panel.php">Panel</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="siparisler.php">Siparişler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="isletmeler.php">İşletmeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="kuryeler.php">Kuryeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="rapor.php">Raporlar</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Content -->
         <div class="page-content">
             <div class="container-fluid">
-                <div class="page-title-box">
-                    <h4>Siparişler</h4>
-                </div>
-
-                <!-- Sipariş Tablosu -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Panelden Gelen Siparişler</h4>
-                            </div>
-                            <div class="card-body">
-                                <?php
-                                $query = "SELECT * FROM kurye_cagir ORDER BY created_at DESC";
-                                $stmt = $pdo->query($query);
-                                ?>
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Restoran Adı</th>
-                                            <th>Müşteri Adı</th>
-                                            <th>Telefon</th>
-                                            <th>Adres</th>
-                                            <th>Sipariş Tutarı</th>
-                                            <th>Ödeme Yöntemi</th>
-                                            <th>Durum</th>
-                                            <th>Kabul Et</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                                            <tr data-siparis-id="<?= $row['id'] ?>">
-                                                <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
-                                                <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
-                                                <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
-                                                <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
-                                                <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
-                                                <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
-                                                <td><?= htmlspecialchars($row['durum']) ?></td>
-                                                <td>
-                                                    <form action="" method="POST">
-                                                        <input type="hidden" name="siparis_id" value="<?= $row['id'] ?>">
-                                                        <button type="submit" name="kabul_et" class="btn btn-success btn-sm">Kabul Et</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                <?php if ($siparis): ?>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Sipariş Detayı</h4>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Restoran Adı</th>
+                                        <th>Müşteri Adı</th>
+                                        <th>Telefon</th>
+                                        <th>Adres</th>
+                                        <th>Sipariş Tutarı</th>
+                                        <th>Ödeme Yöntemi</th>
+                                        <th>Aksiyon</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><?= htmlspecialchars($siparis['restoran_adi']) ?></td>
+                                        <td><?= htmlspecialchars($siparis['musteri_adi']) ?></td>
+                                        <td><?= htmlspecialchars($siparis['musteri_telefonu']) ?></td>
+                                        <td><?= htmlspecialchars($siparis['musteri_adresi']) ?></td>
+                                        <td><?= htmlspecialchars($siparis['siparis_tutari']) ?> TL</td>
+                                        <td><?= htmlspecialchars($siparis['odeme_yontemi']) ?></td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="kuryeAta()">Kurye Ata</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </div>
-
-                <!-- Diğer Alanlar Korunmuştur -->
+                <?php else: ?>
+                    <div class="alert alert-danger">Herhangi bir sipariş seçilmedi veya sipariş bulunamadı.</div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <script src="assets/js/vendor.min.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script>
+        function kuryeAta() {
+            alert("Kurye atanma işlemi başlatıldı.");
+            // Buraya kurye atanma işlemini başlatacak kod eklenebilir.
+        }
+    </script>
 </body>
 
 </html>
