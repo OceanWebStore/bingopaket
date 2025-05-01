@@ -145,36 +145,32 @@
                                 $query = "SELECT * FROM kurye_cagir WHERE durum = 'Teslim Edildi' ORDER BY updated_at DESC";
                                 $stmt = $pdo->query($query);
                                 ?>
-                                <?php if ($stmt->rowCount() > 0): ?>
-                                    <table class="table">
-                                        <thead>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Restoran Adı</th>
+                                            <th>Müşteri Adı</th>
+                                            <th>Telefon</th>
+                                            <th>Adres</th>
+                                            <th>Sipariş Tutarı</th>
+                                            <th>Ödeme Yöntemi</th>
+                                            <th>Teslim Tarihi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                                             <tr>
-                                                <th>Restoran Adı</th>
-                                                <th>Müşteri Adı</th>
-                                                <th>Telefon</th>
-                                                <th>Adres</th>
-                                                <th>Sipariş Tutarı</th>
-                                                <th>Ödeme Yöntemi</th>
-                                                <th>Teslim Tarihi</th>
+                                                <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
+                                                <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
+                                                <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
+                                                <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
+                                                <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
+                                                <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
+                                                <td><?= htmlspecialchars($row['updated_at']) ?></td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                                                <tr>
-                                                    <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
-                                                    <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['siparis_tutari']) ?> TL</td>
-                                                    <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
-                                                    <td><?= htmlspecialchars($row['updated_at']) ?></td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        </tbody>
-                                    </table>
-                                <?php else: ?>
-                                    <p>Sonuçlanan sipariş bulunmamaktadır.</p>
-                                <?php endif; ?>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -188,7 +184,7 @@
                                 <h5 class="modal-title" id="kuryeAtaModalLabel">Kurye Ata</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form action="kurye_ata.php" method="POST">
+                            <form action="kurye_ata.php" method="POST" id="kuryeAtaForm">
                                 <div class="modal-body">
                                     <input type="hidden" name="siparis_id" id="siparisIdInput">
                                     <div class="mb-3">
@@ -213,12 +209,21 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('click', function (event) {
+            if (event.target.matches('[data-bs-target="#kuryeAtaModal"]')) {
+                const siparisId = event.target.getAttribute('data-siparis-id');
+                document.getElementById('siparisIdInput').value = siparisId;
+            }
+        });
+    </script>
 </body>
 
 </html>
