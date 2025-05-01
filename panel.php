@@ -1,3 +1,5 @@
+
+text/x-generic panel.php ( HTML document, UTF-8 Unicode text )
 <!DOCTYPE html>
 <html lang="tr">
 
@@ -136,119 +138,13 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Kurye Listesi -->
-                <div class="row mt-4">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Eklenen Son 10 Kurye</h5>
-                            </div>
-                            <div class="card-body">
-                                <?php
-                                try {
-                                    // Tüm kuryeleri getir, id yerine kurye_id kullan!
-                                    $query = "SELECT * FROM kuryeler ORDER BY id DESC LIMIT 10";
-                                    $stmt = $pdo->query($query);
-
-                                    echo '<table class="table table-bordered">';
-                                    echo '<thead>
-                                            <tr>
-                                                <th>ID</th>
-                                            <th>Ad Soyad</th>
-                                            <th>Telefon</th>
-                                            <th>Mail</th>
-                                            <th>Adres</th>
-                                            <th>Durum</th>
-                                            <th>Kayıt Tarihi</th>
-                                            </tr>
-                                          </thead>';
-                                    echo '<tbody>';
-
-                                    while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo '<tr>';
-                                      echo '<td>' . htmlspecialchars($kurye['kurye_id']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['ad_soyad']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['telefon']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['mail']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['adres']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['durum']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['kayit_tarihi']) . '</td>';
-                                        echo '</tr>';
-                                    }
-
-                                    echo '</tbody>';
-                                    echo '</table>';
-                                } catch (PDOException $e) {
-                                    echo "Veritabanı hatası: " . $e->getMessage();
-                                }
-                                ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kurye Ekle -->
-                <div class="row mt-4">
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Kurye Ekle</h4>
-                            </div>
-                            <div class="card-body">
-                                <form action="kurye-ekle.php" method="POST">
-                                    <div class="mb-3">
-                                        <label for="kuryeAdi" class="form-label">Kurye Adı</label>
-                                        <input type="text" class="form-control" id="kuryeAdi" name="kuryeAdi" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="telefon" class="form-label">Telefon</label>
-                                        <input type="text" class="form-control" id="telefon" name="telefon" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="mailAdresi" class="form-label">Mail Adresi</label>
-                                        <input type="email" class="form-control" id="mailAdresi" name="mailAdresi" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="kuryeAdresi" class="form-label">Adres</label>
-                                        <textarea class="form-control" id="kuryeAdresi" name="kuryeAdresi" rows="2" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Ekle</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        document.addEventListener('click', function (e) {
-            if (e.target.classList.contains('btn-kabul') || e.target.classList.contains('btn-iptal')) {
-                const id = e.target.getAttribute('data-id');
-                const islem = e.target.classList.contains('btn-kabul') ? 'kabul' : 'iptal';
-
-                fetch('islem.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `id=${id}&islem=${islem}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById(`siparis-${id}`).remove();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => console.error('Hata:', error));
-            }
-        });
-
-        // 5 saniyede bir Kurye Talep Ekranı verilerini yenile
+        // Siparişleri her 5 saniyede bir yenile
         setInterval(() => {
             fetch('panel.php')
                 .then(response => response.text())
@@ -257,10 +153,34 @@
                     const doc = parser.parseFromString(html, 'text/html');
                     const newContent = doc.querySelector('#kurye-bilgileri').innerHTML;
 
+                    // Yeni içeriği DOM'a ekle
                     document.getElementById('kurye-bilgileri').innerHTML = newContent;
                 })
                 .catch(error => console.error('Hata:', error));
         }, 5000);
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-iptal')) {
+                const id = e.target.getAttribute('data-id');
+
+                if (confirm('Bu siparişi tamamen silmek istediğinizden emin misiniz?')) {
+                    fetch('sil.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`siparis-${id}`).remove();
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Hata:', error));
+                }
+            }
+        });
     </script>
 </body>
 
