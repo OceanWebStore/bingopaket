@@ -20,7 +20,7 @@
         if ($siparisId) {
             $stmt = $pdo->prepare("DELETE FROM kurye_cagir WHERE id = :id");
             $stmt->execute([':id' => $siparisId]);
-            echo "<div class='alert alert-success'>Sipariş başarıyla silindi!</div>";
+            echo "<center><div class='alert alert-success'>Sipariş başarıyla silindi!</div></center>";
         } else {
             echo "<div class='alert alert-danger'>Sipariş silinirken bir hata oluştu!</div>";
         }
