@@ -16,9 +16,7 @@
     <div class="app-wrapper">
         <!-- Topbar -->
         <header class="app-topbar">
-            <div class="container-fluid">
-                
-            </div>
+            <div class="container-fluid"></div>
         </header>
 
         <!-- Sidebar -->
@@ -90,7 +88,7 @@
                                     </thead>
                                     <tbody>
                                         <?php
-                                        require 'db.php'; // Veritabanı bağlantısı
+                                        require 'db.php';
                                         $query = "SELECT * FROM kurye_cagir WHERE durum = 'Beklemede' ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
 
@@ -116,6 +114,56 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ATAMA BEKLEYEN SİPARİŞLER -->
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header bg-warning">
+                                <h5>Atama Bekleyen Siparişler</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped" id="atama-bekleyen-listesi">
+                                    <thead class="table-warning">
+                                        <tr>
+                                            <th>Restoran</th>
+                                            <th>Müşteri</th>
+                                            <th>Telefon</th>
+                                            <th>Adres</th>
+                                            <th>Tutar</th>
+                                            <th>Yöntem</th>
+                                            <th>Durum</th>
+                                            <th>Aksiyon</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $query2 = "SELECT * FROM kurye_cagir WHERE durum = 'Kabul Edildi' AND (atanan_kurye_id IS NULL OR atanan_kurye_id = 0) ORDER BY created_at DESC";
+                                        $stmt2 = $pdo->query($query2);
+
+                                        while ($siparis = $stmt2->fetch(PDO::FETCH_ASSOC)) {
+                                            echo '<tr id="atama-siparis-' . $siparis['id'] . '">';
+                                            echo '<td>' . htmlspecialchars($siparis['restoran_adi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($siparis['musteri_adi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($siparis['musteri_telefonu']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($siparis['musteri_adresi']) . '</td>';
+                                            echo '<td>' . number_format($siparis['siparis_tutari'], 2) . ' ₺</td>';
+                                            echo '<td>' . htmlspecialchars($siparis['odeme_yontemi']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($siparis['durum']) . '</td>';
+                                            echo '<td>
+                                                    <a href="siparisler.php?siparis_id=' . $siparis['id'] . '" class="btn btn-primary btn-sm">Kurye Ata</a>
+                                                  </td>';
+                                            echo '</tr>';
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ATAMA BEKLEYEN SİPARİŞLER SON -->
+
             </div>
         </div>
     </div>
@@ -123,16 +171,14 @@
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // 5 saniyede bir yeni siparişleri kontrol et
         setInterval(() => {
-            fetch('fetch_new_orders.php') // Yeni siparişleri kontrol eden bir PHP dosyası
+            fetch('fetch_new_orders.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const siparisListesi = document.querySelector('#siparis-listesi tbody');
                         data.orders.forEach(order => {
                             if (!document.getElementById(`siparis-${order.id}`)) {
-                                // Yeni siparişleri ekle
                                 const row = document.createElement('tr');
                                 row.id = `siparis-${order.id}`;
                                 row.innerHTML = `
@@ -156,7 +202,6 @@
                 .catch(error => console.error('Yeni siparişler alınırken hata oluştu:', error));
         }, 5000);
 
-        // Kabul Et ve Sil butonları için click event
         document.addEventListener('click', function (event) {
             if (event.target.classList.contains('btn-kabul')) {
                 const siparisId = event.target.dataset.id;
@@ -199,7 +244,6 @@
             }
         });
     </script>
-    
 </body>
 
 </html>
