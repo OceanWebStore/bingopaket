@@ -66,6 +66,7 @@
         <!-- Content -->
         <div class="page-content">
             <div class="container-fluid">
+                <!-- Panelden Gelen Siparişler -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
@@ -151,7 +152,11 @@
                                             echo '<td>' . htmlspecialchars($siparis['odeme_yontemi']) . '</td>';
                                             echo '<td>' . htmlspecialchars($siparis['durum']) . '</td>';
                                             echo '<td>
-                                                    <a href="siparisler.php?siparis_id=' . $siparis['id'] . '" class="btn btn-primary btn-sm">Kurye Ata</a>
+                                                    <a href="siparisler.php?siparis_id=' . $siparis['id'] . '" 
+                                                       class="btn btn-success btn-sm"
+                                                       style="background-color:#28a745;color:#fff;font-weight:bold;border:none;">
+                                                       KURYE
+                                                    </a>
                                                   </td>';
                                             echo '</tr>';
                                         }
@@ -163,6 +168,34 @@
                     </div>
                 </div>
                 <!-- ATAMA BEKLEYEN SİPARİŞLER SON -->
+
+                <!-- SİPARİŞ AKSİYON ALANI -->
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header bg-info">
+                                <h5>Sipariş Aksiyon Alanı</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped" id="siparis-aksiyon-listesi">
+                                    <thead class="table-info">
+                                        <tr>
+                                            <th>Sipariş ID</th>
+                                            <th>Restoran</th>
+                                            <th>Müşteri</th>
+                                            <th>Durum</th>
+                                            <th>Aksiyon</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Buraya php ile veya js ile satır ekleyebilirsiniz -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SİPARİŞ AKSİYON ALANI SONU -->
 
             </div>
         </div>
@@ -177,6 +210,19 @@
                 .then(data => {
                     if (data.success) {
                         const siparisListesi = document.querySelector('#siparis-listesi tbody');
+                        // --- Üstte olmayan verileri Atama Bekleyen Siparişler'den sil ---
+                        const aktifUstIDler = data.orders.map(order => String(order.id));
+                        const atamaSatirlari = document.querySelectorAll('#atama-bekleyen-listesi tbody tr');
+                        atamaSatirlari.forEach(row => {
+                            const idMatch = row.id.match(/^atama-siparis-(\d+)/);
+                            if (idMatch) {
+                                const id = idMatch[1];
+                                if (aktifUstIDler.includes(id)) {
+                                    row.remove();
+                                }
+                            }
+                        });
+                        // --- Panelden Gelen Siparişler tablosuna yeni sipariş ekle ---
                         data.orders.forEach(order => {
                             if (!document.getElementById(`siparis-${order.id}`)) {
                                 const row = document.createElement('tr');
@@ -214,8 +260,32 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        // Üstteki satırı sil
                         document.getElementById(`siparis-${siparisId}`).remove();
                         alert('Sipariş Kabul Edildi.');
+
+                        // Alt tabloya yeni satır ekle
+                        const atamaListesi = document.querySelector('#atama-bekleyen-listesi tbody');
+                        const siparis = data.siparis;
+                        const newRow = document.createElement('tr');
+                        newRow.id = `atama-siparis-${siparis.id}`;
+                        newRow.innerHTML = `
+                            <td>${siparis.restoran_adi}</td>
+                            <td>${siparis.musteri_adi}</td>
+                            <td>${siparis.musteri_telefonu}</td>
+                            <td>${siparis.musteri_adresi}</td>
+                            <td>${Number(siparis.siparis_tutari).toFixed(2)} ₺</td>
+                            <td>${siparis.odeme_yontemi}</td>
+                            <td>${siparis.durum}</td>
+                            <td>
+                                <a href="siparisler.php?siparis_id=${siparis.id}" 
+                                   class="btn btn-success btn-sm"
+                                   style="background-color:#28a745;color:#fff;font-weight:bold;border:none;">
+                                   KURYE
+                                </a>
+                            </td>
+                        `;
+                        atamaListesi.prepend(newRow);
                     } else {
                         alert('Hata: ' + data.message);
                     }
