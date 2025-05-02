@@ -314,6 +314,7 @@
             }
         });
     </script>
+    <audio id="notificationSound" src="assets/sounds/notification.mp3" preload="auto"></audio>
 </body>
 
 </html>
