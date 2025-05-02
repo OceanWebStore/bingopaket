@@ -152,8 +152,9 @@
                                             echo '<td>' . htmlspecialchars($siparis['odeme_yontemi']) . '</td>';
                                             echo '<td>' . htmlspecialchars($siparis['durum']) . '</td>';
                                             echo '<td>
-                                                    <a href="siparisler.php?siparis_id=' . $siparis['id'] . '" 
-                                                       class="btn btn-success btn-sm"
+                                                    <a href="#" 
+                                                       class="btn btn-success btn-sm btn-kurye-atama"
+                                                       data-siparis-id="' . $siparis['id'] . '"
                                                        style="background-color:#28a745;color:#fff;font-weight:bold;border:none;">
                                                        KURYE
                                                     </a>
@@ -201,9 +202,40 @@
         </div>
     </div>
 
+    <!-- Kurye Seç Modal -->
+    <div class="modal fade" id="kuryeSecModal" tabindex="-1" aria-labelledby="kuryeSecModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="kuryeSecModalLabel">Kurye Seç</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group" id="kurye-listesi"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Sesli bildirim için gerekli değişken ve fonksiyonlar
+        let lastOrderCount = null;
+
+        function playNotificationSound() {
+            const audio = document.getElementById('notificationSound');
+            if (audio) audio.play().catch(()=>{});
+        }
+
+        // Tarayıcı otomatik oynatmayı engellemesin diye ilk tıklamada ses izni
+        document.addEventListener('click', function once() {
+            const audio = document.getElementById('notificationSound');
+            if (audio) audio.play().catch(()=>{});
+            document.removeEventListener('click', once);
+        });
+
         setInterval(() => {
             fetch('fetch_new_orders.php')
                 .then(response => response.json())
@@ -243,6 +275,14 @@
                                 siparisListesi.appendChild(row);
                             }
                         });
+
+                        // --- SESLİ BİLDİRİM KONTROLÜ ---
+                        if (Array.isArray(data.orders)) {
+                            if (lastOrderCount !== null && data.orders.length > lastOrderCount) {
+                                playNotificationSound();
+                            }
+                            lastOrderCount = data.orders.length;
+                        }
                     }
                 })
                 .catch(error => console.error('Yeni siparişler alınırken hata oluştu:', error));
@@ -278,8 +318,9 @@
                             <td>${siparis.odeme_yontemi}</td>
                             <td>${siparis.durum}</td>
                             <td>
-                                <a href="siparisler.php?siparis_id=${siparis.id}" 
-                                   class="btn btn-success btn-sm"
+                                <a href="#" 
+                                   class="btn btn-success btn-sm btn-kurye-atama"
+                                   data-siparis-id="${siparis.id}"
                                    style="background-color:#28a745;color:#fff;font-weight:bold;border:none;">
                                    KURYE
                                 </a>
@@ -312,9 +353,56 @@
                 })
                 .catch(error => console.error('Silme işlemi başarısız:', error));
             }
+
+            // Kurye Atama MODAL açma
+            if (event.target.classList.contains('btn-kurye-atama')) {
+                event.preventDefault();
+                const siparisId = event.target.getAttribute('data-siparis-id');
+                const myModal = new bootstrap.Modal(document.getElementById('kuryeSecModal'));
+                myModal.show();
+
+                fetch('kuryeleri_getir.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const kuryeListesi = document.getElementById('kurye-listesi');
+                        kuryeListesi.innerHTML = '';
+                        if (data.success && data.kuryeler.length > 0) {
+                            data.kuryeler.forEach(kurye => {
+                                const li = document.createElement('li');
+                                li.className = 'list-group-item list-group-item-action';
+                                li.style.cursor = "pointer";
+                                li.textContent = kurye.ad + ' ' + kurye.soyad + ' (' + kurye.telefon + ')';
+                                li.onclick = function() {
+                                    fetch('kurye_ata.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            siparis_id: siparisId,
+                                            kurye_id: kurye.id
+                                        })
+                                    })
+                                    .then(resp => resp.json())
+                                    .then(respData => {
+                                        if (respData.success) {
+                                            alert('Kurye atandı!');
+                                            myModal.hide();
+                                            // Tabloyu burada güncelleyebilirsin
+                                            // İstersen sayfayı yenile:
+                                            // location.reload();
+                                        } else {
+                                            alert('Hata: ' + (respData.message || 'Kurye atanamadı!'));
+                                        }
+                                    });
+                                };
+                                kuryeListesi.appendChild(li);
+                            });
+                        } else {
+                            kuryeListesi.innerHTML = '<li class="list-group-item">Aktif kurye bulunamadı.</li>';
+                        }
+                    });
+            }
         });
     </script>
     <audio id="notificationSound" src="assets/sounds/notification.mp3" preload="auto"></audio>
 </body>
-
 </html>
