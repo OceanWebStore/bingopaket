@@ -5,13 +5,13 @@
     <?php
     session_start();
 
-    // Giriş kontrolü devredışı bırakıldı
-    // if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    //     header('Location: giris-yap.php');
-    //     exit;
-    // }
+    // Giriş kontrolü aktifleştirildi
+    if (!isset($_SESSION['isletme_mail']) || empty($_SESSION['isletme_mail'])) {
+        header('Location: index.php');
+        exit;
+    }
 
-    // Restoran Bilgileri ÇEKME
+    // Veritabanı bağlantısı ve isletme bilgilerini çekme
     $restoranAdi = "";
     $restoranIletisim = "";
     $restoranAdres = "";
@@ -19,15 +19,17 @@
     try {
         $pdo = new PDO("mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4", "oceanweb_kuryeuser", "ko61tu61.");
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        // Son eklenen restoranı al
-        $stmt = $pdo->query("SELECT * FROM restoranlar ORDER BY id DESC LIMIT 1");
+
+        // Giriş yapan mail adresine sahip işletmeyi çek
+        $stmt = $pdo->prepare("SELECT * FROM isletmeler WHERE mail = ? LIMIT 1");
+        $stmt->execute([$_SESSION['isletme_mail']]);
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $restoranAdi = htmlspecialchars($row['restoran_adi']);
-            $restoranIletisim = htmlspecialchars($row['restoran_iletisim']);
-            $restoranAdres = htmlspecialchars($row['restoran_adres']);
+            $restoranAdi = htmlspecialchars($row['ad']);
+            $restoranIletisim = htmlspecialchars($row['telefon']);
+            $restoranAdres = htmlspecialchars($row['adres']);
         }
     } catch (PDOException $e) {
-        // Bağlantı hatası varsa inputlar boş kalsın
+        // Bağlantı hatası: inputlar boş bırakılır
     }
     ?>
     <!-- Title Meta -->
@@ -179,9 +181,59 @@
                         </div>
                     </div>
                 </div>
-                
-                AAAAAAAAA
-    </div>
+              </div>
+              <!-- Siparişler Tablosu -->
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Müşteri Adı</th>
+                <th>Telefon</th>
+                <th>Adres</th>
+                <th>Sipariş Tutarı</th>
+                <th>Ödeme Yöntemi</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody id="siparisTablosu">
+            <!-- Bu alan JS ile doldurulacak -->
+        </tbody>
+    </table>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    function siparisleriGetir() {
+        fetch('../siparisler.php')
+            .then(response => response.json())
+            .then(data => {
+                const tablo = document.getElementById('siparisTablosu');
+                tablo.innerHTML = ''; // Tabloyu temizle
+
+                data.forEach(siparis => {
+                    const tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                        <td>${siparis.musteri_adi}</td>
+                        <td>${siparis.musteri_telefonu}</td>
+                        <td>${siparis.musteri_adresi}</td>
+                        <td>${siparis.siparis_tutari}</td>
+                        <td>${siparis.odeme_yontemi}</td>
+                        <td>${siparis.durum ? siparis.durum : 'Beklemede'}</td>
+                    `;
+
+                    tablo.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Hata:', error));
+    }
+
+    // İlk tabloyu yükle
+    siparisleriGetir();
+
+    // Tabloyu düzenli olarak güncelle (örneğin her 10 saniyede bir)
+    setInterval(siparisleriGetir, 10000);
+});
+</script>
     <!-- Wrapper Bitiş -->
 
     <!-- Modal (Pop-up) -->
@@ -275,23 +327,42 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // Sesli bildirim
-                    const msg = new SpeechSynthesisUtterance(`Bingo Kurye Çağrısı Oluşturuldu. Kısa Süre İçerisinde Kuryemiz Kapınızda !!`);
-                    window.speechSynthesis.speak(msg);
-
-                    alert('Kurye çağrısı başarıyla oluşturuldu!');
-                } else {
-                    alert('Bir hata oluştu.');
+                // Modalı öncelikle kapat
+                const modalElement = document.getElementById('kuryeCagirModal');
+                let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalElement);
                 }
+                modalInstance.hide();
+
+                // Modal tamamen kapandıktan sonra bildirimi göster
+                function handler() {
+                    if (data.success) {
+                        const msg = new SpeechSynthesisUtterance(`Bingo Kurye Çağrısı Oluşturuldu. Kısa Süre İçerisinde Kuryemiz Kapınızda !!`);
+                        window.speechSynthesis.speak(msg);
+                        alert('Kurye çağrısı başarıyla oluşturuldu!');
+                    } else {
+                        alert('Bir hata oluştu.');
+                    }
+                    modalElement.removeEventListener('hidden.bs.modal', handler);
+                }
+                modalElement.addEventListener('hidden.bs.modal', handler);
             })
             .catch(error => {
-                console.error('Hata:', error);
-            });
+                // Modalı hata olsa da kapat
+                const modalElement = document.getElementById('kuryeCagirModal');
+                let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalElement);
+                }
+                modalInstance.hide();
 
-            // Modalı kapat
-            const modal = bootstrap.Modal.getInstance(document.getElementById('kuryeCagirModal'));
-            modal.hide();
+                function handler() {
+                    alert('Bir hata oluştu.');
+                    modalElement.removeEventListener('hidden.bs.modal', handler);
+                }
+                modalElement.addEventListener('hidden.bs.modal', handler);
+            });
         });
     </script>
 
@@ -317,7 +388,6 @@
             const sonucDiv = document.getElementById('restoranKayitSonuc');
             if(data.success){
                 sonucDiv.innerHTML = '<span style="color:green;">Restoran başarıyla kaydedildi.</span>';
-                // Form reset edilmez, bilgiler ekranda kalır.
             } else {
                 sonucDiv.innerHTML = '<span style="color:red;">' + (data.message || 'Kayıt sırasında hata oluştu.') + '</span>';
             }
