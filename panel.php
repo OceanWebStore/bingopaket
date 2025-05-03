@@ -1,3 +1,6 @@
+<?php
+require 'db.php';
+?>
 <!DOCTYPE html>
 <html lang="tr">
 
@@ -10,6 +13,24 @@
     <link rel="stylesheet" href="assets/css/style.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="assets/js/config.js"></script>
+    <style>
+        .btn-onay-bekliyor {
+            background: #dc3545 !important;
+            color: #fff !important;
+        }
+        .btn-kurye-yolda {
+            background: #28a745 !important;
+            color: #fff !important;
+        }
+        .btn-teslim-alindi {
+            background: #0d6efd !important;
+            color: #fff !important;
+        }
+        .btn-teslim-edildi {
+            background: #1a1a1a !important;
+            color: #fff !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -37,11 +58,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="panel.php">
                             <i class="iconify" data-icon="mdi:view-dashboard-outline"></i> Panel
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="siparisler.php">
-                            <i class="iconify" data-icon="mdi:cart-outline"></i> Siparişler
                         </a>
                     </li>
                     <li class="nav-item">
@@ -89,7 +105,6 @@
                                     </thead>
                                     <tbody>
                                         <?php
-                                        require 'db.php';
                                         $query = "SELECT * FROM kurye_cagir WHERE durum = 'Beklemede' ORDER BY created_at DESC";
                                         $stmt = $pdo->query($query);
 
@@ -181,15 +196,59 @@
                                 <table class="table table-striped" id="siparis-aksiyon-listesi">
                                     <thead class="table-info">
                                         <tr>
-                                            <th>Sipariş ID</th>
                                             <th>Restoran</th>
                                             <th>Müşteri</th>
+                                            <th>Telefon</th>
+                                            <th>Adres</th>
+                                            <th>Tutar</th>
+                                            <th>Yöntem</th>
+                                            <th>Kurye</th>
                                             <th>Durum</th>
-                                            <th>Aksiyon</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Buraya php ile veya js ile satır ekleyebilirsiniz -->
+                                        <?php
+                                        // Kurye adı-ismi için LEFT JOIN ile çekiyoruz
+                                        $aksiyon = $pdo->query("
+                                            SELECT kc.id, kc.restoran_adi, kc.musteri_adi, kc.musteri_telefonu, kc.musteri_adresi, kc.siparis_tutari, kc.odeme_yontemi, kc.siparis_durumu,
+                                                   k.ad AS kurye_adi, k.soyad AS kurye_soyad
+                                            FROM kurye_cagir kc
+                                            LEFT JOIN kuryeler k ON kc.atanan_kurye_id = k.id
+                                            WHERE kc.atanan_kurye_id IS NOT NULL AND kc.atanan_kurye_id <> 0
+                                            ORDER BY kc.created_at DESC
+                                        ");
+                                        $durumlar = [
+                                            'Onay Bekliyor' => 'btn-onay-bekliyor',
+                                            'Kurye Yolda'   => 'btn-kurye-yolda',
+                                            'Teslim Alındı' => 'btn-teslim-alindi',
+                                            'Teslim Edildi' => 'btn-teslim-edildi'
+                                        ];
+                                        while ($row = $aksiyon->fetch(PDO::FETCH_ASSOC)):
+                                            $aktifDurum = $row['siparis_durumu'] ?? 'Onay Bekliyor';
+                                            $kuryeAdSoyad = trim(($row['kurye_adi'] ?? '') . ' ' . ($row['kurye_soyad'] ?? ''));
+                                        ?>
+                                        <tr data-siparis-id="<?= $row['id'] ?>">
+                                            <td><?= htmlspecialchars($row['restoran_adi']) ?></td>
+                                            <td><?= htmlspecialchars($row['musteri_adi']) ?></td>
+                                            <td><?= htmlspecialchars($row['musteri_telefonu']) ?></td>
+                                            <td><?= htmlspecialchars($row['musteri_adresi']) ?></td>
+                                            <td><?= number_format($row['siparis_tutari'], 2) ?> ₺</td>
+                                            <td><?= htmlspecialchars($row['odeme_yontemi']) ?></td>
+                                            <td><?= $kuryeAdSoyad ? htmlspecialchars($kuryeAdSoyad) : '<span class="text-danger">Atama Yok</span>' ?></td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn dropdown-toggle durum-btn <?= $durumlar[$aktifDurum] ?? 'btn-secondary' ?>" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <?= $aktifDurum ?>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <?php foreach ($durumlar as $isim => $renk): ?>
+                                                            <li><a class="dropdown-item durum-sec" href="#" data-durum="<?= $isim ?>"><?= $isim ?></a></li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <?php endwhile; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -221,6 +280,39 @@
     <script src="assets/js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // ---- SİPARİŞ AKSİYON ALANI DURUM DEĞİŞTİRME ----
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('#siparis-aksiyon-listesi').forEach(function(table){
+                table.addEventListener('click', function(e){
+                    if(e.target.classList.contains('durum-sec')) {
+                        e.preventDefault();
+                        var durum = e.target.getAttribute('data-durum');
+                        var tr = e.target.closest('tr');
+                        var siparisId = tr.getAttribute('data-siparis-id');
+                        var btn = tr.querySelector('.durum-btn');
+                        fetch('siparis_durum_guncelle.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'siparis_id=' + encodeURIComponent(siparisId) + '&yeni_durum=' + encodeURIComponent(durum)
+                        })
+                        .then(resp => resp.json())
+                        .then(data => {
+                            if(data.success) {
+                                btn.textContent = durum;
+                                btn.classList.remove('btn-onay-bekliyor','btn-kurye-yolda','btn-teslim-alindi','btn-teslim-edildi','btn-secondary');
+                                if(durum == 'Onay Bekliyor')   btn.classList.add('btn-onay-bekliyor');
+                                if(durum == 'Kurye Yolda')     btn.classList.add('btn-kurye-yolda');
+                                if(durum == 'Teslim Alındı')   btn.classList.add('btn-teslim-alindi');
+                                if(durum == 'Teslim Edildi')   btn.classList.add('btn-teslim-edildi');
+                            } else {
+                                alert('Güncelleme başarısız: ' + (data.message || ''));
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
         // Sesli bildirim için gerekli değişken ve fonksiyonlar
         let lastOrderCount = null;
 
@@ -386,9 +478,7 @@
                                         if (respData.success) {
                                             alert('Kurye atandı!');
                                             myModal.hide();
-                                            // Tabloyu burada güncelleyebilirsin
-                                            // İstersen sayfayı yenile:
-                                            // location.reload();
+                                            location.reload();
                                         } else {
                                             alert('Hata: ' + (respData.message || 'Kurye atanamadı!'));
                                         }
@@ -404,5 +494,7 @@
         });
     </script>
     <audio id="notificationSound" src="assets/sounds/notification.mp3" preload="auto"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
