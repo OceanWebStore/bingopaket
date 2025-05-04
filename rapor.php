@@ -6,7 +6,7 @@
     session_start();
     ?>
     <meta charset="utf-8" />
-    <title>Bingo Paket - Kuryeler</title>
+    <title>Bingo Paket - Raporlar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Kurye yönetim paneli" />
     <meta name="author" content="StackBros" />
@@ -72,12 +72,27 @@
                     </a>
                 </div>
                 <ul class="navbar-nav">
-                    <li class="menu-title">MENÜ</li>
-                    <li class="nav-item"><a class="nav-link" href="panel.php">Panel</a></li>
-                    <li class="nav-item"><a class="nav-link" href="siparisler.php">Siparişler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="isletmeler.php">İşletmeler</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="kuryeler.php">Kuryeler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="rapor.php">Raporlar</a></li>
+                   <li class="menu-title">MENÜ</li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="panel.php">
+                            <i class="iconify" data-icon="mdi:view-dashboard-outline"></i> Panel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="isletmeler.php">
+                            <i class="iconify" data-icon="mdi:storefront-outline"></i> İşletmeler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="kuryeler.php">
+                            <i class="iconify" data-icon="mdi:moped-outline"></i> Kuryeler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="rapor.php">
+                            <i class="iconify" data-icon="mdi:file-chart-outline"></i> Raporlar
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -88,56 +103,73 @@
                     <h4>Rapor Sayfası</h4>
                 </div>
                 <div class="row">
-                    <div class="col-lg-12">
+                    <!-- Sol Üst - Kurye Raporları -->
+                    <div class="col-lg-6 col-md-12">
                         <div class="card">
-                            <div class="card-header">
-                                <h4>Rapor Sayfası Sistem Geneli Veri Yazdırır.</h4>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4>Kurye Raporları</h4>
+                                <!-- Print Button -->
+                                <button onclick="printKuryeRaporlari()" class="btn btn-primary btn-sm">Yazdır</button>
+                            </div>
+                            <div class="card-body">
+                                <p>Burada kurye raporları yer alacak. Dinamik veriler eklendi.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Sağ Üst - Restoran Raporları -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4>Restoran Raporları</h4>
+                                <!-- Print Button -->
+                                <button onclick="printRestoranRaporlari()" class="btn btn-primary btn-sm">Yazdır</button>
                             </div>
                             <div class="card-body">
                                 <?php
-                                // Veritabanı bağlantısı
-                                $dsn = "mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4";
-                                $username = "oceanweb_kuryeuser";
-                                $password = "ko61tu61.";
-
                                 try {
-                                    $pdo = new PDO($dsn, $username, $password);
+                                    $pdo = new PDO("mysql:host=localhost;dbname=oceanweb_kurye;charset=utf8mb4", "oceanweb_kuryeuser", "ko61tu61.");
                                     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                                 // Tüm kuryeleri getir, id yerine kurye_id kullan!
-                                    $query = "SELECT * FROM kuryeler ORDER BY id DESC LIMIT 10";
-                                    $stmt = $pdo->query($query);
+                                    // Günlük Paket Sayısı
+                                    $queryPaket = "SELECT COUNT(*) as gunluk_paket FROM siparisler WHERE DATE(siparis_tarihi) = CURDATE()";
+                                    $stmtPaket = $pdo->query($queryPaket);
+                                    $gunlukPaket = $stmtPaket->fetch(PDO::FETCH_ASSOC)['gunluk_paket'];
 
-                                    echo '<table class="table table-bordered">';
-                                    echo '<thead>
-                                            <tr>
-                                                    <th>ID</th>
-                                            <th>Ad Soyad</th>
-                                            <th>Telefon</th>
-                                            <th>Mail</th>
-                                            <th>Adres</th>
-                                            <th>Durum</th>
-                                            <th>Kayıt Tarihi</th>
-                                            </tr>
-                                          </thead>';
-                                    echo '<tbody>';
+                                    // Kapıda Nakit Siparişlerin Toplamı
+                                    $queryNakit = "SELECT SUM(tutar) as kapida_nakit FROM siparisler WHERE DATE(siparis_tarihi) = CURDATE() AND odeme_yontemi = 'Kapıda Nakit'";
+                                    $stmtNakit = $pdo->query($queryNakit);
+                                    $kapidaNakit = $stmtNakit->fetch(PDO::FETCH_ASSOC)['kapida_nakit'];
 
-                                   while ($kurye = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo '<tr>';
-                                      echo '<td>' . htmlspecialchars($kurye['kurye_id']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['ad_soyad']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['telefon']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['mail']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['adres']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['durum']) . '</td>';
-                                        echo '<td>' . htmlspecialchars($kurye['kayit_tarihi']) . '</td>';
-                                        echo '</tr>';
-                                    }
-                                    echo '</tbody></table>';
+                                    echo "<p>Günlük Paket Sayısı: <strong>" . htmlspecialchars($gunlukPaket) . "</strong></p>";
+                                    echo "<p>Kapıda Nakit Sipariş Tutarı: <strong>" . htmlspecialchars($kapidaNakit) . " TL</strong></p>";
                                 } catch (PDOException $e) {
-                                    echo "<div class='alert alert-danger'>Veritabanı hatası: " . htmlspecialchars($e->getMessage()) . "</div>";
+                                    echo "Restoran raporları yüklenirken hata oluştu: " . $e->getMessage();
                                 }
                                 ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <!-- Sol Alt - Gelir Raporları -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Gelir Raporları</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Burada gelir raporlarını görüntüleyebilirsiniz. Dinamik veriler eklenecek.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Sağ Alt - Gider Raporları -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Gider Raporları</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Burada gider raporlarını görüntüleyebilirsiniz. Dinamik veriler eklenecek.</p>
                             </div>
                         </div>
                     </div>
@@ -145,8 +177,31 @@
             </div>
         </div>
     </div>
+    <!-- Print Scripts -->
+    <script>
+        function printKuryeRaporlari() {
+            const content = document.querySelector(".card-body").innerHTML;
+            const printWindow = window.open("", "_blank");
+            printWindow.document.write("<html><head><title>Kurye Raporları</title></head><body>");
+            printWindow.document.write(content);
+            printWindow.document.write("</body></html>");
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function printRestoranRaporlari() {
+            const content = document.querySelector(".card-body").innerHTML;
+            const printWindow = window.open("", "_blank");
+            printWindow.document.write("<html><head><title>Restoran Raporları</title></head><body>");
+            printWindow.document.write(content);
+            printWindow.document.write("</body></html>");
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
     <!-- Vendor JS -->
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
+
 </html>
