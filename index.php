@@ -6,9 +6,9 @@
      <meta charset="utf-8" />
      <title>Bingo Paket - Sıcak Sıcak Kapında !</title>
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <meta name="description" content="Hızlı, güvenilir ve ekonomik kurye hizmetleri! İster bireysel, ister kurumsal gönderileriniz için profesyonel çözümler sunuyoruz. Şimdi bizimle gönderin, zamanında teslimatın keyfini çıkarın!" />
+     <meta name="description" content="Hızlı, güvenilir ve ekonomik kurye hizmetleri! İster bireysel, ister kurumsal gönderileriniz için profesyonel çözümler sunuyoruz. Şimdi bizimle gön...
      <meta name="author" content="OCEANWEB" />
-     <meta name="keywords" content="şehir içi kurye, ekspres kurye, motorlu kurye, acil kurye, hızlı kurye, güvenli kurye, 7/24 kurye, gece kurye, aynı gün teslimat, moto kurye, belge taşıma, paket teslimatı, özel kurye, kurye fiyatları, kurye çağır, kurye hizmeti, kurye firması, kurye şirketi, kurye servisi, kurye gönderimi, kurye rezervasyonu, kurye takip, kurye siparişi, kurye hizmetleri, kurye çözümleri" />
+     <meta name="keywords" content="şehir içi kurye, ekspres kurye, motorlu kurye, acil kurye, hızlı kurye, güvenli kurye, 7/24 kurye, gece kurye, aynı gün teslimat, moto kurye, belge taşı"
      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
      <meta name="robots" content="index, follow" />
      <meta name="theme-color" content="#ffffff">
